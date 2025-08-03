@@ -1,0 +1,55 @@
+---
+title: 'Streamlined Data Engineering Architecture: Leveraging Supabase CDC, Kafka, Apache Flink, and Typesense'
+publishedAt: '2024-05-14'
+summary: 'cdc at scale'
+---
+
+Integrating Supabase Realtime, Kafka, Flink, and Typesense. Recently, I've built a system that keeps data flowing smoothly and processes it efficiently. This blend of advanced tech ensures we handle real-time data, scale effectively, and supercharge our search capabilities.
+
+### Technologies Used:
+
+1. Supabase Realtime: Database and CDC Handler
+2. Event Processor: Standalone application that subscribes to CDC events and publishes to Kafka.
+3. Apache Kafka: Event storing and Stream processing.
+4. Apache Flink: Stateful Unified Stream Processing with Data Guarantee.
+5. Typesense: Search engine meticulously engineered for robust performance.
+
+![Workflow Diagram](https://fnz1dopstoar937o.public.blob.vercel-storage.com/workflow-IFLHaXqKZNg6HdXb1xw0jf9XWd9Gga.jpeg "Workflow Diagram")
+
+
+# Architecture Overview
+
+#### 1. Supabase Realtime for Change Data Capture (CDC):
+
+Supabase Realtime acts as the backbone for capturing changes in our data. Its efficient Change Data Capture real-time mechanism ensures that we remain up-to-date with every modification, allowing for real-time accuracy in our dataset.
+
+#### 2. Event Processor and Kafka Integration:
+
+We've developed a custom event processor to subscribe to Supabase events. This processor efficiently relays these events to Kafka, ensuring a scalable and reliable streaming architecture. As a robust message broker, Kafka handles this continuous stream of events flawlessly. 
+
+#### 3. Kafka as a Message Broker:
+
+Kafka's prowess in managing distributed data streams is unparalleled. It effectively manages the flow of data from the event processor to the downstream consumers, maintaining the integrity and reliability of our data.
+
+![Kakfa UI](https://fnz1dopstoar937o.public.blob.vercel-storage.com/kafka-aTutvtU39MFvOtXLS3cbR6BiMiMdxV.png "Kafka UI")
+
+#### 4. Apache Flink as a Stream Processor:
+
+Apache Flink, our stream processor, plays a pivotal role in consuming data from Kafka. Its powerful filtering capabilities streamline the data, ensuring only relevant information moves forward in the pipeline. This step is crucial for optimizing downstream processes.
+
+![Flink Dashboard](https://fnz1dopstoar937o.public.blob.vercel-storage.com/Apache%20Flink%20Web%20Dashboard%20(1)-yUEROVvadVvypOT2YbDBr6CBrEWKul.png "Apache Flink Dashboard")
+
+#### 5. Typesense Integration for Enhanced Search:
+
+By enriching and adding filtered data from Flink, Typesense, our search engine, gains access to a refined dataset. This integration significantly boosts our search capabilities, allowing for quicker and more accurate searches across various fields and parameters. 
+
+![Typesense Dashboard](https://fnz1dopstoar937o.public.blob.vercel-storage.com/typesese-yROdYIv89IRm42MFMJRJynbtRpaVaB.png "Typesense Dashboard")
+
+
+
+
+
+
+
+
+

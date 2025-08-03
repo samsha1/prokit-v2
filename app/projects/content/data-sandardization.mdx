@@ -1,0 +1,33 @@
+---
+title: 'Leveraging Microsoft Fabric for Data Standardization & Post Processing'
+publishedAt: '2024-10-14'
+summary: 'data standardization'
+---
+
+In my recent Data Engineering project, I leveraged Microsoft Fabric for data standardization, a crucial task that involved processing millions of unstructured records and transforming them into standardized, actionable datasets. The data was stored in OneLake, where I applied various data engineering techniques to ensure consistency and quality before distributing the results to multiple destinations, such as SupabaseDB for storage and Power BI for analytics and visualization.
+
+### Key Steps in the Process
+
+1. **Data Collection and Standardization:**  
+   First collected vast amounts of raw, unstructured data from various sources. To standardize each dataset, I created unique dataflows in Microsoft Fabric, named "STD_DataFlow_manufacturer_name". These dataflows were responsible for validating the datasets, ensuring all required columns were present, and filling in missing values where necessary.
+   
+   ![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/DEV_Silver-Data%20Factory-WWSsDmoR1AoAx7DtQ5eowRaXiJRlxA.png "data_factory")
+
+   ![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/WaterMarkLookupPipeline-ODj6aM8mTFrY0GqqjmIWFATtpfyGrW.png "data_pipeline")
+
+2. **Handling Outliers and Missing Columns:**  
+   During standardization, outliers were identified and removed to maintain data quality. The dataflow automatically added any missing columns, ensuring that the datasets aligned with the expected schema. Where data was incomplete, I implemented logic to infer missing values or flag them for further review.
+
+   ![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/data_factory-gpiLNaWlaxT2kgxuWpbIuP4FosqrkL.png "standardization_data_factory")
+
+
+3. **Creating and Merging Series Identifiers:**  
+   One of the more complex parts of the process involved generating a "parent_id" for each product, which represents the product's series. To achieve this, I duplicated the entire dataset and extracted unique rows based on the series information. Outliers were removed, and I assigned unique identifiers to the newly created series rows. These were then merged back into the original dataset using "series_name" as the key, updating the master table with this enriched information.
+
+4. **Publishing and Post-Processing:**  
+   Once the data was standardized, filtered, and joined, selected only the required columns and ensured the dataset met quality standards. The final dataset was published to the "product_table" in the lakehouse, where it could be used for further analysis and reporting. These standardized datasets were then pushed to destinations like SupabaseDB for storage and Power BI for visualization and quality assurance.
+
+   ![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/mage_checkup%20-%20Power%20BI-a23VweGmTLmVNix51twizYpqttptZQ.png "standardization_data_factory")
+
+
+

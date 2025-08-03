@@ -1,0 +1,133 @@
+---
+title: 'The 10K+ RPS Proxy Beast: Redefining High-Performance HTTP Traffic Routing'
+publishedAt: '2025-03-14'
+summary: 'The HTTP Proxy Gateway Handling 10K+ Requests per Second'
+---
+
+Web crawling at scale requires more than just fast scrapers—it demands a proxy gateway that can handle thousands of requests per second without breaking a sweat. This high-performance HTTP proxy server acts as a smart gateway for routing crawler traffic, ensuring seamless request distribution, robust error handling, and real-time metrics collection. From tracking success rates and HTTP errors to monitoring data volume and proxy performance, this powerhouse is built to optimize large-scale data extraction. Whether you're managing thousands of crawlers or streaming massive datasets, this proxy beast is engineered to keep up.
+
+## Technologies Used:
+
+1. **NodeJS**
+
+NodeJS serves as the backbone of the custom proxy server wrapper. It's event-driven and non-blocking I/O model enables you to handle a massive number of concurrent HTTP requests seamlessly. It's lightweight and efficient server that processes incoming crawler requests, manages asynchronous operations, and supports the high-throughput environment required for 1000s+ requests per second.
+
+2. **Alibaba AnyProxy**
+
+Alibaba AnyProxy is integrated as the core HTTP proxy component. In this role, it intercepts and handles the HTTP/HTTPS traffic from thousands of crawlers running paralely. Beyond simply forwarding requests, it enables us to modify and inspect the traffic in real time. This functionality is crucial for capturing request metrics, logging errors, and extracting detailed proxy information, all of which feed into your overall analytics and monitoring system.
+
+3. **GRPC with Protobuf**
+
+gRPC with Protobuf is used to establish efficient and reliable communication between different system modules. The Proxy Server acts as the client-side, using a predefined proto file to structure and serialize data before transmitting it. On the receiving end, we use Apache Flink, which utilizes the same proto file to deserialize incoming data for real-time processing and analytics. This ensures a lightweight, high-performance data exchange, minimizing serialization overhead and enabling seamless integration across high-speed traffic flows and large-scale metrics collection.
+
+4. **Fluentd** 
+
+Fluentd is employed as a unified data collector to aggregate logs, metrics, and error reports, providing a seamless pipeline for data ingestion and analysis. This streamlined collection process enables real-time monitoring, troubleshooting, and performance tracking, ensuring that every request, success rate, and error is captured and readily available for further insights. For post-processing analytics and data streaming, we have used tools like Apache Flink and eventually stored time-series data in InfluxDB. However, we will not focus on these advanced tools here and will cover post-data analytics in a separate discussion.
+
+
+![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/proxy-server-Lucidchart-03-23-2025_11_06_PM-dMa6ZN3rwFXWZ709P98XN8zxPR5lHv.png "working architecture")
+
+*Fig1:Working Architecture*
+
+
+### How it works?
+
+We have thousands of data extraction scripts running in parallel, each sending a massive volume of HTTP requests to remote servers. For example, Script1 extracts e-commerce data from Amazon.com, Script2 pulls product details from Walmart.com, and Script3 scrapes news articles from BBC.com, and so on.
+
+Each of these websites has its own security measures, such as tracking IP addresses, browser sessions, user agents, and cookies. If any request appears suspicious, the server may block it entirely. Given these widespread security mechanisms, extracting data from a single IP address is nearly impossible—we would get blocked after just a few requests.
+
+To bypass these restrictions, manage requests/responses, enable debugging, implement caching strategies, and optimize costs, we developed Proxy Beast—a powerful request and response interceptor.
+
+## Main Components:
+
+## *beforeSendRequest:  Controlling and Modifying Outgoing Requests
+
+A proxy server acts as an intermediary between the client and the target server. When configured with a proxy, all outgoing requests pass through it before reaching their destination. This allows the proxy to inspect the URL, headers, HTTP method, request body, and other metadata.
+
+With beforeSendRequest, we can modify request parameters, inject custom headers, and manipulate the data before forwarding it. The proxy essentially acts as an invisible middleman, able to inspect and alter every byte of an HTTP request without being detected by either the client or the target server.
+
+![beforeSendRequest](https://fnz1dopstoar937o.public.blob.vercel-storage.com/beforesendrequests-jlNljdECMaDh241kXpco9jt0oTbwFz "beforeSendRequest_code")
+
+- The requestDetails parameter contains all metadata, such as headers, URL, HTTP method, and protocol.
+
+- We inject custom headers (prefixed with "X-") to facilitate communication between the client and the proxy server.
+
+- Some requests may need to be blocked entirely (e.g., illegal or malformed URLs). Instead of forwarding these requests, we can return a response immediately without calling the remote website.
+
+- In line 145 of the code, we check if the request is targeting Amazon.in. If so, we stop processing the request and return a response. Otherwise, we modify the request and send it forward.
+
+ 
+### Caching Strategy for Efficiency:
+
+- If a client requests data from cache (based on date-from ~ date-to and cache levels like hourly/daily), the proxy retrieves and serves cached HTML pages instead of making a fresh request.
+
+- This significantly reduces redundant network calls and optimizes request handling depending on cache strategy and cache range.
+
+
+Once processed, the modified requestDetails includes validations, condition checks, custom headers, proxy configurations, and HTTP agents, ensuring successful execution.
+
+
+## *beforeSendResponse: Intercepting and Enhancing Responses
+
+Once a request is sent and a response is received, the beforeSendResponse interceptor allows us to modify the response before it reaches the client. This is crucial for:
+
+ - Logging metrics for monitoring & debugging
+ - Caching responses to reduce redundant requests
+ - Manipulating headers before sending responses to clients
+ - Enhancing data formats for downstream systems
+
+
+![beforesendresponse](https://fnz1dopstoar937o.public.blob.vercel-storage.com/beforesendresponse-j8b7lHfMIgZzPo3J0iMwgJAZHQLjar "beforesendresponse_code")
+
+#### How It Works in Our System:
+
+- The responseDetails object contains headers, body, status code, and payload of the received response.
+
+- We can modify the response based on business logic (e.g., stripping out internal headers).
+
+- The system caches results if caching is enabled based on the request type (e.g., GET requests).
+
+- The response is compressed before writing to a file, optimizing storage.
+
+#### Logging and Monitoring for Cost & Performance Analysis:
+
+- Every request and response is logged for future analysis, including:
+- Status codes (200, 400, 500, etc.)
+- Requested URL, HTTP method, and protocol
+- Request and response payloads
+- Custom metadata (user_id, report_id, etc.)
+- Response time (latency of each request)
+
+All this data is sent to Fluentd, which acts as a unified data collector. As part of our post-processing pipeline, Apache Flink consumes data from Fluentd, performs analysis, and stores time-series insights in InfluxDB for real-time monitoring and performance optimization.
+
+### Key Benefits:
+
+1. **Control Over Each Request/Response:** granular control over all HTTP transactions, ensuring that every request and response is logged and monitored.
+
+2. **Unified Debugging:** A centralized proxy makes it easier to debug and troubleshoot issues by offering a single, unified view of the traffic flow.
+
+3. **Caching with Historical Data:** By storing historical request and response data, the system can leverage caching mechanisms to improve efficiency and reduce redundant processing.
+
+4. **ML, Data Modeling, and Analysis:** Aggregated and detailed data from the proxy server supports advanced machine learning, statistical modeling, and comprehensive data analysis, helping to identify trends and optimize performance.
+
+5. **Proxy Usage and Cost Management:** Monitoring usage patterns allows for effective cost management by tracking resource consumption and ensuring the proxy's operation is cost-efficient.
+
+
+### Final Thoughts:
+
+Implementing Proxy Beast, we have full control over HTTP requests and responses, enabling seamless debugging, cost-efficient caching, optimized proxy usage, and advanced data analytics. This system ensures that even under 1K+ requests per second, we maintain high efficiency, reduced costs, and optimal data quality.
+
+### Conclusion
+
+In today's data-driven world, seamless, efficient, and scalable data extraction is critical. However, challenges such as server restrictions, request blocking, high proxy costs, and inefficient data pipelines often stand in the way.
+
+To tackle these issues, Proxy Beast acts as a smart request-response interceptor, allowing us to:
+    - Modify and optimize requests before they reach the target server
+    - Bypass security restrictions by intelligently handling headers, cookies, and proxy rotations
+    - Cache responses to reduce unnecessary network calls and minimize costs
+    - Enhance debugging and logging for complete visibility and real-time monitoring
+    - Analyze and store metrics using Flink, Fluentd, and InfluxDB to improve efficiency over time
+
+With thousands of data extraction scripts running simultaneously, Proxy Beast ensures high availability, performance optimization, and cost-effectiveness. Whether it’s web scraping, data aggregation, or API management, this system provides a robust foundation for managing HTTP requests at scale.
+
+In the ever-evolving landscape of data extraction, having control over every request and response is no longer an option—it’s a necessity. 🚀

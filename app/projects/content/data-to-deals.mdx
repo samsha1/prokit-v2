@@ -1,0 +1,471 @@
+---
+title: "From Data to Deals: AI Agents Redefining Lead Generation"
+publishedAt: "2025-02-12"
+summary: "AI agents that seamlessly extract executive contacts from any source, transforming scattered data into valuable business leads."
+---
+
+Harnessing the power of AI, this project automates executive data extraction, finding key contacts from company websites and beyond. With intelligent AI agents powered by LangGraph and n8n, it retrieves names, designations, emails, LinkedIn profiles, and more—seamlessly storing the data in Supabase for analytics and Google Sheets for quick review and accesibility. Redefining lead generation, one AI-driven insight at a time!
+
+This project has two workflows:
+
+1. Scraping a public information from publicly available sites. For instance: Go to Company Webpage and lookout for (Team, About, Contact, Leadership, Management, Office, etc) pages.
+2. Working with AI Models by fine-tuning prompt for ranking google result searching for people profile across social site mainly (LinkedIn) and extracting the result with third-party resource
+
+## WORKFLOW 1
+
+Before we begun, we had thousands of webpages and one of the irony of data extraction is each page is defined by unique DOM and restricted with strong IP blockage policy. And writing, thousands of script for each takes lifetime. Therefore, AI comes to play and we didnot hesitate a blik to move forward. Since, last two years there are of number of Open Source Data Extraction tools backed by AI models, to name few: [ScrapeGraphAI](https://github.com/ScrapeGraphAI/Scrapegraph-ai) and [Crawl4AI](https://github.com/unclecode/crawl4ai) being popular open-source options. Crawl4AI is designed for LLM-friendly web crawling, while ScrapeGraphAI uses LLMs and graph logic for data extraction. In our case, the context was simple but extracting unstructured info with LLMs (e.g., “find the company CEO from this page”) and most of the sites that need JavaScript rendering (dynamic content) - as Crawl4AI uses headless browsers (e.g., Playwright under the hood) to browse websites like a human, and then leverages LLMs (like GPT) to extract information directly from rendered pages therefore, this was more suitable for us but for large-scale multiple nodes (scrape ➜ process ➜ extract ➜ transform) I would prefer ScrapeGraphAI.
+
+## Key Challenges:
+
+1. Language Translation
+2. Failure handler, retries and Access Blockage with Captcha
+3. Sitemap and URL filterings - ignore JS, image links
+4. Handle Paginations in one call
+5. Data dedupe
+
+Let's execute this, tools were decided now we build. I think one of the great tuning to accomplish everything we discussed is Prompt. So, let me show you the prompt and discuss how it evolve over time with countless iteration. However, let's not break the flow and tighten a seat belt before we jump into prompt. We will first move ahead with the power of [Crawl4AI](https://docs.crawl4ai.com/) and it's integration. We install the package and instantiate the CrawlerRunConfig class for controlling how the crawler runs each crawl operation. This is the gateway that includes parameters for content extraction, page manipulation, waiting conditions,
+caching, and other runtime behaviors.
+
+```
+from crawl4ai import CrawlerRunConfig, AsyncWebCrawler, BrowserConfig, CacheMode
+
+async def scrape_website(self, base_urls: str):
+    contact_pages = [url for url in base_urls if self.is_contact_page(url)]
+
+    crawler_config = CrawlerRunConfig(
+                        delay_before_return_html=10,
+                        remove_overlay_elements=True,
+                        excluded_tags=['header','footer','meta','style','link','form','nav'],
+                        css_selector='body',
+                        keep_data_attributes=False,
+                        cache_mode=CacheMode.BYPASS
+                    )
+
+    browser_config = BrowserConfig(
+        browser_type="chromium",
+        headless=True,
+        viewport_width=1080,
+        viewport_height=600,
+        use_persistent_context=False,
+        text_mode=False,
+        light_mode=False,
+        java_script_enabled=True
+    )
+
+    for page_url in contact_pages:
+        try:
+            async with AsyncWebCrawler(config=browser_config) as crawler:
+                self.logger.info(f"Processing: {page_url}")
+                result = await crawler.arun(page_url, config=crawler_config,session='session1')
+
+                if result.success:
+                    html_content = result.html
+                    chunks = self.chunk_html(html_content)
+                    for i, chunk in enumerate(chunks, 1):
+                        self.logger.info(f"Processing chunk {i}/{len(chunks)}")
+                        contacts = await self.extract_contact_info(chunk)
+                        await self.save_contacts(page_url,contacts)
+                else:
+                    print("Crawl failed:", result.error_message)
+        except Exception as e:
+            self.logger.error(f"Error scraping {page_url}: {e}")
+
+websites = [
+    'https://tengbom.se/'
+    'https://whitearkitekter.com/',
+    'https://linkarkitektur.com/en/employees',
+    'https://fojab.se'
+]
+for website in websites:
+        await scraper.scrape_website(website)
+
+```
+
+```
+    def chunk_html(self, html_content: str, max_chunk_size: int = None, preserve_tags: bool = True) -> List[str]:
+        """
+        Chunk HTML content while preserving HTML structure and semantic meaning.
+        
+        Args:
+            html_content (str): Input HTML string
+            max_chunk_size (int): Maximum characters per chunk
+            preserve_tags (bool): Whether to maintain HTML tags in chunks
+        
+        Returns:
+            list: List of HTML chunks
+        """
+        if max_chunk_size is None:
+            max_chunk_size = self.config.MAX_CHUNK_SIZE
+
+        # Parse HTML
+        remove_tags = ['header', 'head', 'footer', 'meta', 'style', 'link', 'form', 'nav']
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # Remove specified tags
+        for tag in remove_tags:
+            for element in soup.find_all(tag):
+                element.decompose()
+        
+        # Find all text-containing elements
+        text_elements = []
+        for element in soup.find_all():
+            if element.text.strip():
+                text_elements.append(element)
+        
+        # Group elements into chunks
+        chunks = []
+        current_chunk = []
+        current_size = 0
+        
+        for element in text_elements:
+            element_str = str(element)
+            element_size = len(element_str)
+            
+            if current_size + element_size > max_chunk_size and current_chunk:
+                # Current chunk is full, save it
+                chunks.append(''.join(current_chunk))
+                current_chunk = []
+                current_size = 0
+            
+            current_chunk.append(element_str)
+            current_size += element_size
+        
+        # Add final chunk if not empty
+        if current_chunk:
+            chunks.append(''.join(current_chunk))
+        
+        return chunks
+    def get_sitemap_urls(self, base_url: str) -> List[str]:
+        """Extract URLs from sitemap.xml or generate from homepage."""
+        try:
+            sitemap_url = f"{base_url}/sitemap.xml"
+            response = requests.get(sitemap_url)
+            if response.status_code == 200:
+                root = ET.fromstring(response.content)
+                namespace= {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+                return [elem.text for elem in root.findall('.//ns:loc', namespace)]
+        except Exception:
+            pass
+
+        # Fallback: Extract links from homepage
+        try:
+            response = requests.get(base_url)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            return [
+                requests.compat.urljoin(base_url, link.get('href'))
+                for link in soup.find_all('a', href=True)
+                if any(keyword in link.get('href', '').lower() for keywords in self.contact_keywords.values() for keyword in keywords)
+            ]
+        except Exception as e:
+            self.logger.error(f"Error extracting homepage URLs: {e}")
+            return []
+
+    def is_contact_page(self, url: str) -> bool:
+        """Determine if URL is likely a contact page."""
+        return any(
+            f"/{keyword}/" in url.lower() 
+            for keywords in self.contact_keywords.values() 
+            for keyword in keywords
+    
+    def is_duplicate_contact(self, email: str) -> bool:
+        """Check if contact already exists in Supabase."""
+        result = self.supabase_client.table('swe_contacts').select('*').eq('email', email).execute()
+        return len(result.data) > 0
+
+    @retry_on_failure(3)
+    async def save_contacts(self, page_url, contacts: List[Dict]):
+        """Save contacts to Supabase, avoiding duplicates."""
+        if contacts is not None:
+            try:
+                contacts = json.loads(contacts)
+                contacts = contacts['data']
+                for contact in contacts:
+                    email = contact.get('email')
+                    person_name = contact.get('person_name')
+                    if email and person_name and not self.is_duplicate_contact(email):
+                        data = {
+                            'company_name': contact.get('company_name', ''),
+                            'url': contact.get('url', ''),
+                            'person_name': contact.get('person_name', ''),
+                            'email': contact.get('email', ''),
+                            'phone': contact.get('phone', ''),
+                            'title': contact.get('title', ''),
+                            'office_location': contact.get('office_location', ''),
+                            'linkedin_profile': contact.get('linkedin_profile', ''),
+                            'image_url': contact.get('image_url', ''),
+                            'twitter_handle': contact.get('twitter_handle', ''),
+                            'facebook_handle': contact.get('facebook_handle', ''),
+                            'instagram_handle': contact.get('instagram_handle', ''),
+                            'source_link': page_url
+                        }
+                        await self.supabase_client.table('swe_contacts').insert(data).execute()
+            except Exception as e:
+                self.logger.error(f"Error saving contacts: {e}")
+                raise
+```
+
+Let's break it down:
+
+#### What does CrawlerRunConfig do?
+
+CrawlerRunConfig is like the instructions manual for each crawl session. It tells the crawler how to behave once a page is loaded.
+
+- **delay_before_return_html=3**: Waits for 10 seconds before collecting the page HTML — useful for letting JavaScript finish loading.
+- **remove_overlay_elements=True**: Removes pop-ups, cookie banners, and annoying overlays that block real content.
+- **excluded_tags**: Tags like header, footer, meta, style, link, form, and nav are stripped out — so the crawler focuses only on the useful body content.
+- **css_selector='body'**: Tells the crawler which part of the page to extract. Here, it grabs everything inside the body tag.
+- **keep_data_attributes=False**: Drops unnecessary data-\* attributes from the final HTML.
+- **cache_mode=CacheMode.BYPASS**: Ensures the crawler always fetches fresh content, ignoring any cached versions.
+
+#### What does BrowserConfig do?
+
+BrowserConfig defines how the crawler’s internal browser behaves when visiting a webpage. Think of it as setting up a virtual browser to mimic a real user.
+
+- **browser_type="chromium"**: Uses Chromium, a fast and widely supported headless browser.
+- **headless=True**: Runs the browser without a visible UI — faster and more efficient for automation.
+- **viewport_width & viewport_height**: Sets the virtual browser window size — this can affect how some websites load responsive layouts.
+- **use_persistent_context=False**: Makes sure no cookies or sessions persist between runs — every visit is clean.
+- **text_mode=False**: Keeps normal rendering instead of plain text.
+- **light_mode=False**: Uses default or dark mode if the website has it.
+- **java_script_enabled=True**: Allows JavaScript to run — essential for modern sites that load data dynamically.
+
+Together, BrowserConfig lets the crawler mimic a real user, ensuring the site behaves normally and the right data loads.
+
+#### How does it all work together?
+
+1. Filter URLs: The scrape_website function first checks which pages are likely to be contact pages using is_contact_page.
+2. Configure the crawl: It sets up CrawlerRunConfig and BrowserConfig for a clean, customized crawl.
+3. Crawl & Extract: For each contact page, the crawler:
+
+   - Loads the page.
+   - Cleans the HTML.
+   - Splits it into chunks.
+   - Extracts contact info (names, emails, phone numbers, etc.).
+
+4. Saves the contacts to a database (Supabase) or Google Sheets.
+5. Run on Multiple Sites: The script loops through a list of websites, running the whole flow for each one.
+
+Once the HTML is squeaky clean, this is where the magic — and the madness — happens. Chopped the page into bite-sized chunks and feed them to my OpenAI Python SDK workflow, armed with a carefully nagged prompt. This prompt didn’t come alive in single go — it took countless iterations, rephrasings, “please be smarter this time” tweaks, and more coffee than I’d like to admit.
+
+#### AI Prompts with Fine-Tuning
+
+- Once the page HTML is ready, Split it into manageable chunks. Each chunk goes through my OpenAI Python SDK workflow, using a carefully crafted prompt. This prompt is fine-tuned to:
+
+- Detect names, roles, emails, phone numbers, LinkedIn URLs, and even profile images.
+
+- Adapt its extraction logic if the format changes — it’s flexible enough to handle different layouts across hundreds of sites.
+
+- Iteratively improve: If the first pass misses data, it reprocesses intelligently.
+
+```
+"""
+    @rate_limit(60)  # 60 requests per minute
+    @retry_on_failure(3)
+    async def extract_contact_info(self, html_content: str) -> List[Dict]:
+        """Extract contact information using OpenAI."""
+        prompt = """
+        You are an AI web scraping agent tasked with extracting personal and professional contact information from publicly accessible websites. The extracted data should always be formatted as a list of objects under the key data with the following structure:  
+
+            ---
+
+            Key Data Points to Extract (Crucial):
+
+                - company_name: Company Name  
+                - url: Website URL  
+                - person_name: Person's Name  
+                - email: Person's Email Address  
+                - phone: Person's Phone Number  
+                - title: Job Title (Optional)  
+                - office_location: Office Location (Optional)  
+                - linkedin_profile: LinkedIn Profile URL  
+                - image_url: Person's Image URL  
+            ---
+
+            Scraping Approach:
+            
+            1. Data Extraction Strategy:  
+                - HTML Parsing: Extract visible elements like <h1>, <a>, <p>, <img>, etc.  
+                - Script Parsing: Some data might be hidden within <script> tags as JSON.  
+                    - Use regex to identify JSON objects and extract required details.  
+                    - Parse all JSON objects carefully to gather as much data as possible.  
+                    - Ensure no data is missed, even if it requires reviewing multiple JSON structures (e.g., object.data, object.contact, object.entries, etc.).  
+
+            2. Special Instructions:  
+                - See More/View More/Visa fler/SHOW ALL  buttons:  
+                    - Look for expandable "SHOW ALL"/"Visa fler" buttons (or their equivalents in different languages such as Swedish, Danish, or Norwegian).  
+                    - Parse and extract all data within these sections. Mostly, these data are available under JS scripts. and starts with var data = { ... }. Therefore we need to parse using regex and extract the data inside JSON.  
+            - Review Thoroughly:  
+                - Double-check extracted data for completeness. Ensure no key-value pairs are left behind.  
+                - Avoid providing incomplete or partial responses.  
+
+            3. Handling Null Values:  
+            - If certain data points are missing in HTML, attempt to extract them from JSON within <script> tags.  
+            - Retry with different approaches if data isn't found initially.  
+
+            ---
+
+            Output Format:
+            The extracted data should always be formatted as a list of objects under the key `data` with the following keys inside:
+
+                | company_name | url | person_name | email | phone | title | office_location | linkedin_profile | image_url | twitter_handle | facebook_handle | instagram_handle
+
+            Finally,Review the HTML page source carefully and extract all the datasets from both HTML and <script> tags inside JSON. Ensure all columns are populated where applicable. If multiple persons are found, create separate rows for each entry. Review the extracted data carefully to avoid missing any details or responding with incomplete results. 
+        """
+        
+        try:
+            response = self.openai_client.chat.completions.create(
+                model="o1", 
+                messages=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": html_content}
+                ],
+                response_format={"type": "json_object"}
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            self.logger.error(f"Error extracting contact info: {e}")
+            raise
+
+```
+
+This tells the AI exactly what to look for and how to present it.
+
+### Pro Tip: Make the Prompt Yours
+
+No two websites — or data needs — are the same. Feel free to tweak the prompt:
+
+- Add or remove fields (like social handles, bios, or extra metadata).
+
+- Adjust instructions to match how your data should be structured — YAML, JSON, CSV, you name it.
+
+- Refine how strict or flexible the extraction should be.
+
+A great prompt evolves with your use case — so don't refrain to experiment, test, and iterate.
+
+## Connecting the Dots
+
+After the AI does its magic with the cleaned HTML chunks, the extracted contact details — names, emails, phone numbers, images — don’t just sit idle. They’re stored automatically in Supabase, then synced to a Google Sheet, giving stakeholders a live link to fresh leads at any moment — zero manual copy-pasting required.
+
+But what really makes this setup scalable is the way the crawler runs under the hood.
+
+```
+async with AsyncWebCrawler(config=browser_config) as crawler:
+    self.logger.info(f"Processing: {page_url}")
+    result = await crawler.arun(page_url, config=crawler_config, session='session1')
+```
+
+AsyncWebCrawler is an asynchronous crawler — think of it as a fleet of virtual browsers working at the same time. By using async with, the crawler spins up a headless browser instance for each website, runs all the page loading, rendering, and cleaning tasks — and then automatically cleans up resources when done. - await crawler.arun(...) line kicks off the actual crawl for a given page URL, using the rules you set in CrawlerRunConfig (like removing overlays, waiting for JavaScript, etc.). - session='session1' parameter lets you isolate crawl sessions — so you can track or reuse cookies/context if needed, or run multiple parallel sessions without conflicts.
+
+Because it’s asynchronous, you can spin up dozens or even hundreds of these crawlers in parallel. They process multiple pages at once without blocking each other — making your lead extraction fast, efficient, and harder for websites to block.
+
+## The Result
+
+With this pipeline, we turned a manual, error-prone task into a fully automated AI agent — hunting down real, actionable executive contacts to supercharge lead generation.
+
+## WORKFLOW 2 - Working Architecture:
+
+Imagine, you have the company name, Person Name, Designation but the personal information like (Email, Phone Number) and other sales enrichment data points are not easily available via company website, or other public web-areas and social professional platform like LinkedIn won't allow to access API at scale. Therefore, you start searching for alternatives. This is where Workflow 2 comes to rescue and find the leads.
+
+![workflow2](https://fnz1dopstoar937o.public.blob.vercel-storage.com/AI-agent-n8n-GeOJ1DgVkHRVOcAPXpbEnboWguEjaK.png "workflow2")
+
+Let's go through each node and dive deep in the AI agent with the models prompt used for each tools.
+
+Above architecture, goes through google sheets with some company, person and designation details but misses the email contact information and eventually appends it to same google-sheet. At scale, we will enable a webhook that listens to any incoming request with either one of the fields being required i.e. Company Name or Person Name and send an email by identifying in real-time. Here, We have minor validation enabled for client request parameters -- When user provides either one of Company/Person name our agent is smart enough to identify the right tools to extract expected information.
+
+The AI model that we are using is gpt-4o-mini model with k_temp=0.1 so that, model won't hellucinate. A lower temperature makes the output more deterministic and focused on the most likely predictions, while a higher temperature introduces more randomness and explores less probable options.
+
+Let's go through the prompt:
+
+```
+
+Your are an intelligent Email Finder AI Agent and your task is to find the email address of the specified person, but only if they are currently associated with the given company name.
+
+Input:
+  - Company Name: {{ $json.trademark_name }}
+  - Person Name: {{ $json.gpt_contact_name }}
+
+Instructions:
+
+1. Verify Company Association
+    - Check the person's current company name on LinkedIn.
+    - Compare it with {{ $json.trademark_name }}, ensuring a similarity match (it doesn’t have to be an exact match).
+    - If the company name does not match, do not proceed to mail finder (Findymail.com).
+2. Retrieve Email Address
+    - If the company matches, send an HTTP request to Findymail.com to fetch the person's email.
+    - Only make the request if the company is correctly matched.
+    - Do NOT suggest any alternative email addresses if no valid email is found.
+3. Output Format
+    - The response should always be in JSON format.
+    - If an email is found, return:
+
+    {
+        "email": "sam@example.com"
+    }
+
+    else, return:
+
+    {
+     "email": "not found"
+    }
+
+```
+
+The instruction is clear enough to convey, based on company name retrieve person email address and there are few tools this agent has to go through in order to get the desired output. There are two third-party application we are depending:
+
+1. [Apify](https://apify.com/) Actors (For Google and LinkedIn Scraping)
+2. [Findymail](https://app.findymail.com) (Extracts Person email - based on LinkedIn URL / Person Name and Company URL)
+
+<i>Note: We use Findymail as backup as we try to minimize the cost and try to get as much from Apify LinkedIn scraping.</i>
+
+For Instance, We have a Company Name: Finstral and Person Name: Andreas Davis and we'd like to extract email of the person currently working in Finstral. So, we assert these information to the prompt variables above. First, we try to get the Person LinkedIn Profile URL. For this, we use Apify Google search actor, that basically calls Gooogle API and does search to find the URL. For this, Person Name is enough:
+
+```
+
+{
+    "forceExactMatch": false,
+    "includeIcons": false,
+    "includeUnfilteredResults": false,
+    "maxPagesPerQuery": 1,
+    "mobileResults": false,
+    "queries": "site:linkedin.com/in {query}",
+    "resultsPerPage": 3,
+    "saveHtml": false,
+    "saveHtmlToKeyValueStore": true
+}
+
+```
+
+This JSON payload is used with the Apify Google Search Actor to perform a Google Search in an automated way. This payload strictly searches Google for LinkedIn profiles using a query (e.g., "Andreas Davis" becomes site:linkedin.com/in Andreas Davis) and gets top 3 results from the first page only. After this nodes succesfully gets persons linkedIn URL, agent now invokes LinkedIn Apify actor to scrape LinkedIn person profile. We pass URL as a next payload:
+
+```
+{
+    "url": [
+"{linkedinpersonurl}"
+    ]
+}
+
+```
+
+If a person’s email is found through their LinkedIn profile, the AI agent stops further execution and returns the result in structured JSON. But we’re always designing with exceptions in mind—what if it’s not available? In such cases, the agent doesn’t give up. Instead, it shifts strategy: crawling the company’s LinkedIn page and searching by designation. This is where the "Find person via position" task kicks in. For example, say you’re looking for a Sustainability Manager at Amazon—the agent runs a query like:
+
+```
+site:linkedin.com/in Amazon sustainability manager
+```
+
+This Google-powered search surfaces likely LinkedIn profiles. Once we land on the right one, we extract the URL and trigger a Findymail request, complete with built-in email verification.
+
+
+### Memory
+
+Agent doesn't need to remember the past messages therefore, we can ignore Memory buffering. However, let's say we develop a chat based agent where your agent needs context on past messages, that comes with Session and Context Window Length i.e. How many past interactions the model receives as context so that the response is optimal and relatable.
+
+<b>In essence</b>, We started with scattered website data and ended with a clean list of decision-makers ready for outreach. Two agentic workflows did the heavy lifting:
+
+1. Crawler + LLM to harvest and structure every exec detail we could find.
+2. Verifier + Email-finder to plug the gaps when the first pass came up short.
+
+The real win isn’t the code or the prompts—it’s the feedback loop. Each scrape, each prompt tweak, each enrichment call makes the next run sharper and faster.  The system evolves—like a good sales rep refining and adjusting their pitch after every call. 
+
+So what’s the takeaway? If you’re still copying emails off LinkedIn by hand, you’re burning daylight. Let the bots grind; reserve your energy for the conversation that closes the deal.
+
+Now, back to building—because the pipeline never sleeps.

@@ -1,0 +1,36 @@
+---
+title: 'Containers Log Processing Pipeline'
+publishedAt: '2024-05-04'
+summary: 'log processing pipeline at scale'
+---
+
+Containers Log Processing Pipeline is a real-time data log processing system designed for internal developers to run/debug their plugins seamlessly. It is responsible for collecting log data from various containers, processing it in real-time, and storing it in a scalable way to debug in a decisive way later. The system utilizes RabbitMQ for log collection, AWS kinesis for data ingestion, Apache Flink for stream processing, and ElasticSearch as a part of the EFK stack for data storage and visualization.
+
+![cover-image](https://fnz1dopstoar937o.public.blob.vercel-storage.com/ContainerLogProcessing-kEl6M4J4BvHR74yeNtLc1THsmDd5zR.png "cover image")
+
+
+Technologies Used:
+
+- Fluend: Log Collection
+- AWS Kinesis: Data ingestion
+- Apache Flink in JAVA: Data Stream Processing
+- ElasticSearch as a part of EFK stack: Data Storage and Visualization.
+- Other tools: Git, Drone for Continuous Integration, Kubernetes for container orchestration.
+
+## Flink Architecture:
+
+![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/pipeline_annotate-qDbHWJRPQlkNKl3bC3tW5MdQee92eV.png "workflow")
+
+
+The figure above illustrates, Flink Bolt reads data from Kinesis in real-time, applies some truncation to the data to reduce its size, and then stores it in Elasticsearch, which is a highly scalable open-source search and analytics engine. The truncation is done to reduce the log size and optimize storage space in Elasticsearch.
+
+Here's how the process works:
+
+1. The Flink Bolt reads data from Kinesis in real-time.
+2. The data is then processed, which involves applying the truncation to reduce its size.
+3. Once the data is truncated and mapped with the keys, it is then sent to Elasticsearch for storage and indexing. Elasticsearch stores the data in a distributed manner and provides fast and efficient search capabilities.
+4. Finally, the stored logs can be visualized using Kibana as shown below.
+
+![workflow](https://fnz1dopstoar937o.public.blob.vercel-storage.com/elastic_annotate_new-O4kNB1SNuX3OvAGI0r7GtmgHno8hvg.png "workflow")
+
+Overall, the Flink Bolt is a powerful tool for processing real-time data streams from Kinesis and storing it in Elasticsearch. This allows organizations to gain insights and make data-driven decisions in real-time, as well as improve their data storage and retrieval capabilities.

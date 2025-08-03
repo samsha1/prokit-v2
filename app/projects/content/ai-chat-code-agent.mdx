@@ -1,0 +1,87 @@
+import IframeEmbed from '../components/IframeEmbed'
+
+---
+title: 'AI-Code Agent on popular Chat Apps (WhatsApp & Telegram)'
+publishedAt: '2025-07-12'
+summary: 'Build Website using your friendly Chat App'
+---
+
+A couple of days back - their was this post from Paras Chopra under Steal this [idea](https://www.linkedin.com/posts/paraschopra_steal-this-idea-an-ai-powered-coding-agent-activity-7347818498577899524-1MxE?utm_source=share&utm_medium=member_desktop&rcm=ACoAAB_kiD8B_s9FPajvLjBzeSXiIeTdhHrcjCw) : 
+
+![post](https://fnz1dopstoar937o.public.blob.vercel-storage.com/Activity-Paras-Chopra-LinkedIn-07-30-2025_09_56_AM.png "post")
+
+At the same time, I was surfing internet and looking for ideas for my next project - interestingly, above idea hit me and looked practical. There are millions of people who owns small local business and has access to Whatsapp as their daily regulator. However, as a portfolio they
+don't have enough resource to build websites. One option, which has been running for a long time is outsourcing but that has huge cost and countless iteration. Therefore, what if we give a platform where local businesses can build their websites through chat application that they already use.
+
+## Why it's compelling?
+
+1. Whatsapp & Telegram has huge global penetration, even with non-technical people.
+2. Many aspiring solopreneurs, freelancers, students don’t want to learn Git or IDEs — they just want something that works.
+3. The friction is low: everyone knows how to chat.
+4. Replit, CodePen, GitHub Codespaces still require a laptop (or at least browser) + basic coding knowledge.
+
+
+#### With this motivation, I started brainstorming with ChatGPT. Initially, core feature I am targeting:
+
+1. AI Code agent on Whatsapp/Telegram:
+    - So user talks to an AI (Claude, Gemini or GPT) inside Whatsapp.
+    - Can follow-up for edit, image-uploads and further updates.
+    - Manage multiple projects and branching.
+    - Deploy site to live for preview just by chatting.
+    - Preview deployed site, with screenshots (Unfortunately, rendering JS is not supported in chat apps - so, no iframe embeddings)
+    - Deploy to production with custom domain
+2. Future Aispiration:
+    - Support Voice, typing long requirements on phones is difficult, so this might be efficient - User dictates changes.
+    - Multi-language support - serve non-English users.
+    - Same agent across Telegram, Messenger, Viber where Whatsapp isn't #1
+
+
+Everything looks promising and exciting, so I rolled up my sleeves and began designing POC. So, What's feasible right now? - keeping cost minimal but development fast..
+
+- Setup Whatsapp Business API but comes with cost, hold my beer! Telegram bot is free! So, switching their without second thought also, the setup is quite easy no verification and approval, wait-time, business account. 
+- AI models - Gemini 2.5pro also API available for free
+- Backend - Tiny FastAPI to orchestrate flow.
+- Code Branching and Context Management - Github
+- Hosting for generated sites - Vercel (generous free tiers)
+- Auth, Logs, Serverless Functions, Data & File Storage - The big-beautiful Supabase.
+
+<div style={{ display: "flex", justifyContent: "center" }}>
+  <img
+    src="https://y.yarn.co/133753c4-e1c8-4b36-879c-bf5d436f78b8_text.gif"
+    alt="let-the-hacking-begin"
+    width="480"
+  />
+</div>
+
+## Work progress Screenshots:
+
+<div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+  <img
+    src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/siteship-ai/WhatsApp%20Image%202025-07-21%20at%2014.49.36.jpeg"
+    alt="telegram-first-test"
+    width="300"
+  />
+  <img
+    src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/siteship-ai/WhatsApp%20Image%202025-07-21%20at%2014.49.36%20(1).jpeg"
+    alt="telegram-second-test"
+    width="300"
+  />
+  <img
+    src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/siteship-ai/WhatsApp%20Image%202025-07-21%20at%2014.49.37.jpeg"
+    alt="telegram-third-test"
+    width="300"
+  />
+</div>
+
+### 📉 Unexpected Roadblock: Telegram Banned in Nepal (July 21, 2025)
+
+Bad news - <b> 19 Jul, 2025 </b> Nepal Goverment all of a sudden bans Telegram, which unfortunately disrupted the gateway for my product that was built around it. Telegram had been a fantastic platform for rapid development and testing — no business verification, no complex approval processes — just plug and build. I'll genuinely miss its flexibility and hope the government reconsiders this decision soon.
+
+Moving on, With Telegram out of the picture - I am currently integrating WhatsApp via Twilio and there are many learning curves. I spent almost a day trying to integrate using WhatsApp native Business API using Meta, but quickly realized how complex the process was:
+
+- Government-level business verification
+- Long approval wait times
+- Overwhelming and scattered documentation
+
+In contrast, Twilio’s WhatsApp sandbox has been a breath of fresh air. It allows quick testing without needing all the bureaucratic overhead — a perfect fit for my current POC. I also looked into 360dialog, an official Meta partner that simplifies WhatsApp API access considerably. However, their pricing model wasn’t quite aligned with my current product stage. Onward and upward, despite the detour — this is all part of the building journey. 🚀
+

@@ -1,0 +1,446 @@
+---
+title: 'How you test your code?'
+publishedAt: '2024-05-28'
+summary: 'How you test your code?'
+---
+Testing code is one of the most important part to understand your application and behavior of code.Every developer knows how painful bugs can be, especially in the production stage as it takes hours of hard work. Testing each scenario can be as good as believing yourself. You write and execute your code, without knowing how it behaves if some exception occurs or some validation violates, this may cause a problem in staging or production. So, running test case plays a vital role in SDLC. You give rich life and believe your code with eye closed, once your test coverage is at good level.
+
+Today, we are going to write a simple test methods and run test code using tools like Xdebug and PHPUnit. PHPUnit is a programmer-oriented testing framework. This is the outstanding testing framework for writing Unit tests for PHP Web Applications. With the help of PHPUnit, we can direct test-driven improvement.
+
+Let's install PHPUnit:
+
+```sh
+wget https://phar.phpunit.de/phpunit-7.5.phar
+chmod +x phpunit-7.5.phar
+sudo mv phpunit-7.5.phar /usr/bin/phpunit
+```
+
+There are several other way to insall phpunit. Find more here:[phpunit](https://phpunit.readthedocs.io/en/8.0/installation.html).
+
+Now, To get our Test Coverage full report we need to install Xdebug:
+
+```sh
+sudo apt install php-pear
+pecl install xdebug
+sudo apt-get install php-xdebug
+```
+
+Find More about Xdebug here: [xdebug](https://xdebug.org/docs/install).
+
+Without making further delay Let's dive into our simple test scenarios where we test whether an array is empty:
+
+Create a folder UnitTest where we will include all testable files. In this folder, create a subfolder tests. Create a new file `phpunit.xml` in this subfolder and add following code.
+
+```PHPUnit
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors = "true" verbose="true" stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>/UnitTest/tests/</directory>
+        </testsuite>
+    </testsuites>
+     <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+             <directory>/UnitTest/tests/</directory>
+        </whitelist>
+    </filter>
+</phpunit>
+
+```
+
+The `colors=”true”` will show the results in highlighted colors and `<directory>./UnitTestFiles/Test/</directory>` will ask PHPUnit for the location of the files to be tested. The filter tag is used while discovering GUI based report with statistics analysis of our test coverages.
+
+## Basic Conventions to Write Unit Test Case
+
+Following are some basic conventions and steps for writing tests with PHPUnit:
+
+1. Test File names should have a suffix Test. For example, if First.php needs to be tested,the name of the test file name will be FirstTest.php
+2. Similarly, If the class name is MyFirstClass than the test class name will be MyFirstClassTest.
+3. Add test as the prefix for method names. For example, if the method name is getuser(), then in test class, it will become testgetuser(). You can also use @test annotation in document block to declare it as a testing method.
+4. All testing methods are public
+5. MyFirstClassTest class should be inherited from `PHPUnit\Framework\TestCase`.
+
+These are the ground rules for the PHP unit testing framework. The essential configurations and settings are all setup. It is now time to write the first test case.
+
+Writing The First Unit Test Case in PHP
+
+Create a file EmptyTest.php in UnitTest/tests. Add the following code to it.
+
+```PHP
+<?php
+use PHPUnit\Framework\TestCase;
+
+class EmptyTest extends TestCase
+{
+    public function testFailure()
+    {
+        $this->assertEmpty(['something']);
+    }
+}
+
+?>
+```
+
+Now, to run our test code inside terminal type: phpunit i.e. phpunit tests/EmptyTest.php.
+
+Note: By running only phpunit, it defaults executes all test file inside UnitTest/tests directory because we have mentioned this directory in phpunit.xml above.
+
+We will get our test failure because the value inside array is not empty. In my terminal I am getting:
+
+```sh
+F                                                                   1 / 1 (100%)
+
+Time: 513 ms, Memory: 10.00MB
+
+There was 1 failure:
+
+1) EmptyTest::testFailure
+Failed asserting that an array is empty.
+
+/home/samrat/myproj/testcase/tests/EmptyTest.php:8
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+
+```
+
+Let's pass our above test case and add one more scenario to test equals.
+
+```PHP
+<?php
+
+use PHPUnit\Framework\TestCase;
+class EmptyTest extends TestCase
+{
+    public function testFailure()
+    {
+        $this->assertEmpty([]);
+    }
+
+}
+
+?>
+```
+
+```PHP
+<?php
+
+use PHPUnit\Framework\TestCase;
+
+class EqualsTest extends TestCase
+{
+    public function testFailure()
+    {
+        $this->assertEquals(0,1); //failed asserting 0 and 1 are equal
+    }
+
+}
+
+?>
+```
+
+It gives an error when $expected is not equal to $actual. If $expected equals $actual then it returns true. Remember, the first argument is expected and the other is actual. The above test only passes if expected (0) is equal to (1). To pass above test case just replace 0 with 1 or 1 with 0. Now, run both testcase.
+
+Our both test must pass:
+
+```sh
+
+PHPUnit 7.5.6 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 7.3.1-1+ubuntu18.04.1+deb.sury.org+1 with Xdebug 2.7.0
+Configuration: /home/samrat/myproj/UnitTest/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 200 ms, Memory: 10.00MB
+
+OK (2 tests, 2 assertions)
+
+```
+
+You can find more about assertion here: [PHPUnit Assertion](https://phpunit.de/manual/6.5/en/appendixes.assertions.html)
+
+Let’s look at another example in which a developer has created a code to parse the items received in json and validate it for the possible use case may be exception or for other validation rules.
+
+Let's create app/item_parser.php file inside UnitTest directory
+
+```php
+
+<?php
+namespace App\Parser;
+
+require_once 'exceptions.php';
+
+use App\Exceptions\JsonParseException;
+use App\Exceptions\InvalidNumberFormatException;
+
+class ItemsParser {
+
+	public static function parse($response){
+			$jDecode=json_decode($response);
+			if (JSON_ERROR_NONE !== json_last_error()){
+           		throw new JsonParseException('Error parsing JSON:'.$response);
+           	}
+			$jd=$jDecode->_embedded->menu_items;
+			$parsed = [];
+
+			foreach($jd as $key => $item){
+				$price=$item->price_per_unit;
+				if (is_string($price)) {
+					throw new InvalidNumberFormatException('Invalid numeric value encountered:'.$price);
+				}
+				 $parsed[$item->id] = [
+                    "label" => $item->name,
+                    "value" => number_format(($price/100), 2, '.', ' ')
+                ];
+  			}	
+  			return $parsed;
+
+		}
+
+}
+
+?>
+
+```
+
+I've created a class called ItemsParser with static method called parse that takes one argument called response, received from json data. We have checked for different exceptions and returned parsed data as an array.
+
+Let's add some exceptions class for above use cases inside same directory:
+
+```PHP
+
+<?php
+namespace App\Exceptions;
+
+class JsonParseException extends \Exception {}
+class InvalidNumberFormatException extends \Exception {}
+
+?>
+
+```
+
+Now in the UnitTest/tests folder, create a new file called ItemsParserTest.php and add the following test code:
+
+```php
+<?php
+
+use PHPUnit\Framework\TestCase;
+
+require_once __DIR__ . '/../app/item_parser.php';
+use App\Parser\ItemsParser;
+
+
+class ItemsParserTest extends TestCase
+{	
+  
+   public function test_create_ItemsParser() {
+        $ip = new ItemsParser();
+        $this->assertEquals('App\Parser\ItemsParser', \get_class($ip));
+    }
+
+}
+
+?>
+```
+
+Run above test case, Our test case must pass. By, this we can assure ItemParser class is successfully instantiated.
+
+As, we don't invoke real endpoint. Let's create a fake json data called one.json inside UnitTest/json and test with it.
+
+```json
+
+
+{
+		"_embedded": {
+			"menu_items": [
+				{
+					"id": "1",
+					"in_stock": null,
+					"name": "Pizza",
+					"open": false,
+					"pos_id": "101",
+					"price_per_unit": 899
+
+				}
+			]
+
+		}
+}
+
+```
+
+Now Let's write another test method to ensure our data is actually parsed the way we expected it:
+
+```php
+
+<?php
+
+use PHPUnit\Framework\TestCase;
+
+require_once __DIR__ . '/../app/item_parser.php';
+require_once __DIR__ . '/../app/exceptions.php';
+
+use App\Exceptions\JsonParseException;
+use App\Parser\ItemsParser;
+use App\Exceptions\InvalidNumberFormatException;
+
+
+class ItemsParserTest extends TestCase
+{	
+	var $dir = __DIR__ . '/../json/';
+
+    public function test_create_ItemsParser() {
+        $ip = new ItemsParser();
+        $this->assertEquals('App\Parser\ItemsParser', \get_class($ip));
+    }
+
+    public function test_parseSingleItem_shouldReturnArrayOneLabelAndValue(){
+       $items=file_get_contents($this->dir.'one.json');
+       $expected = ['1' => ['label' => 'Pizza', 'value' => '8.99']];
+    	 $this->assertSame($expected, ItemsParser::parse($items));
+    }
+
+}
+
+?>
+
+```
+
+As, we created fake data, and send that data to ItemParser::parse() method. If we now run our test case we get the data as the way we expected.
+
+```sh
+
+PHPUnit 7.5.8 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 7.2.15-0ubuntu0.18.04.1 with Xdebug 2.6.0
+Configuration: /home/samrat/myproj/UnitTest/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 377 ms, Memory: 10.00 MB
+
+OK (2 tests, 2 assertions)
+
+```
+
+Actually, what we did is we send json data and decoupled it on our data only with label and value as key and returned only data that is required as an array.
+
+Now, Let's test for the array keys we are getting:
+
+```php
+
+<?php
+
+use PHPUnit\Framework\TestCase;
+
+require_once __DIR__ . '/../app/item_parser.php';
+require_once __DIR__ . '/../app/exceptions.php';
+
+use App\Exceptions\JsonParseException;
+use App\Parser\ItemsParser;
+use App\Exceptions\InvalidNumberFormatException;
+
+
+class ItemsParserTest extends TestCase
+{   
+    var $dir = __DIR__ . '/../json/';
+
+    public function test_JsonParser_arrayKey_shouldReturnKey_label_and_value(){
+        $items=file_get_contents($this->dir.'one.json');
+        $itemId='1';
+        $parsed=ItemsParser::parse($items);
+        $this->assertArrayHasKey('label',$parsed[$itemId]);
+        $this->assertArrayHasKey('value',$parsed[$itemId]);
+        
+    }
+
+}
+
+?>
+```
+
+From above code we can ensure that whether we are getting the key we expected i.e label and value.
+
+What about the exceptions we added to our methods, whether they are working the way we wanted? Well I am not sure so let's test it.
+
+Say, we have some json data with price in string:
+
+```json
+
+{
+		"_embedded": {
+			"menu_items": [
+				{
+					"id": "1",
+					"in_stock": null,
+					"name": "Pizza",
+					"open": false,
+					"pos_id": "101",
+					"price_per_unit": "iamstring"
+
+				},
+				{
+					"id": "2",
+					"in_stock": null,
+					"name": "Burger",
+					"open": false,
+					"pos_id": "101",
+					"price_per_unit":"gfsgd"
+
+				}
+			]
+
+		}
+}
+
+```
+
+How our code block response when we send price as string, well we must be sure our code handles such kind of exceptions.
+
+```php
+ public function test_stringPriceValueProvided_shouldThrow_InvalidNumberFormatException(){
+        $items=file_get_contents("stringPrice.json")
+        $this->expectException(InvalidNumberFormatException::class);
+        $parsed=ItemsParser::parse($items);
+    }
+```
+
+expectException() method is to ensure whether expected exception is thrown by our code block. Run phpunit and check above code it must by the way!
+
+Revise, the ItemParser.php file we have used number_format function to convert cent price into dollar.So, Let's write test to check whether our price has been successfully converted.
+
+```php
+
+public function testCent_Conversion_toDollar(){
+        $items=$this->file_get_contents('one.json');
+    	  $itemId='1';
+        $parsed= ItemsParser::parse($items);
+    	  $this->assertEquals(8.99,$parsed[$itemId]['value']);
+
+    }
+```
+
+And These test can go on and on, wouldn't it be nice to get report or analyzer for our test case. To get total test coverage report would be great. So, we have written some test code and let's generate our test report and find out how much code did we really covered?
+
+It's simple just type this in terminal: `phpunit --coverage-html`. In my case `phpunit --coverage-html report/`. You will get whole report in html format. By the way, we can generate in xml, php, text and many other formats. Just type: `phpunit --help` for more.
+
+![PHP TEST](https://fnz1dopstoar937o.public.blob.vercel-storage.com/test-0an4jimrmt4r7e9x7tib-ZhWACr0RQJCQjLOKEuJjoDO8CTLJtQ.png "php TEST")
+
+Above test coverage explains, our first example test coverage is 100% but ItemParserTest could be better and we only covered some part of our code so let's stick with 90%. I leave it up to you to make it 100%. Actually, 80% code coverage can be acceptable coverage in software world (heard somewhere).
+
+We also get the report of where we can do better. Here's some other code coverage statistics:
+
+![PHP TEST Chart](https://fnz1dopstoar937o.public.blob.vercel-storage.com/test-20zrtkjkcnmgc86ohsvx-23UqXAhjfpnV3UpbDySd1VlpnniDZF.png "php test chart")
+
+
+## Conclusion
+This article explains a basic setup that help you in getting started with PHPUnit for PHP unit testing.
+
+Hope you find this article helpful. Unit Testing is a vast topic. Here I have given you a brief introduction so that you can start writing your own tests. I would like to mention several changes in the latest version of PHPUnit. In the previous versions, the class extend with PHPUnit_Framework_TestCase. In the latest version, it extends with TestCase only.
+
+You are awesome!
+
+
+
+

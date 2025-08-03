@@ -17,7 +17,7 @@ export default function Page() {
           priority
         />
       </a>
-      <h2 className="slogan">Builder / Tinkerer / Sports</h2>
+      <h2 className="slogan">Builder / Tinkerer / Explorer</h2>
       <div className="prose prose-neutral dark:prose-invert">
         <p className="mb-4">
           {`I am a hobbyist Software Engineer more inclined and fascinated towards Data.`}
@@ -32,7 +32,6 @@ export default function Page() {
                 embarked upon the opportunities that lies in Software Engineering. 
                 Upon working with core engineering team in`}{" "}
           <a
-            className="font-bold underline"
             href="https://www.berrybytes.com"
           >{`BerryBytes`}</a>{" "}
           {`(then Nepallink Network) I got chance to explore 
@@ -51,7 +50,7 @@ export default function Page() {
           {`as a software engineer, immersing myself in the dynamic realm of data exploration. This role provided me with hands-on experience in processing expansive data pipelines, orchestrating proxy servers, 
                 and deploying containerized applications onto Kubernetes infrastructure.`}
         </p>
-        <p>
+        <p className="mb-4">
           {`In a world driven by data, its evolutionary usage continually shapes the 
                 technological landscape. The concepts of Distributed Systems, 
                 Big Data, and Cloud Computing have revolutionized technology on a large scale, 
@@ -62,7 +61,10 @@ export default function Page() {
           {`data units on a daily basis. Working as a core backend engineer to manage such intricate data has been a challenging pursuit. 
                 This complexity is what propels my sense of pride in deploying a system that works seamlessly by solving real-world problems of data accessibility. `}
         </p>
-        <br />
+        <p>
+           {`I identify strongly as an explorer, a worldview that drives everything I do. Moving to new places, travelling, working, meeting to new people with different point of view, language & culture has always captivated me. Somewhere, I have also realised, we are all same - kind, social and hopeful. The cities, the mountains, the streets, and the silences are the mirrors and reflection of self, each revealing a little more of who I am and who I am aspire becoming. You travel not to escape, but to remember. `}
+
+        </p>
         <p className="mb-4">
           {`Last updated on ${buildInfo.lastUpdated}. I can be reached at: `}{" "}
           <a

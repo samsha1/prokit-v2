@@ -1,33 +1,48 @@
 import Link from "next/link";
-import type { Metadata } from "next";
-import { projects } from "./project-data";
+import { formatDate, getProjectsPosts } from "app/lib/posts";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Projects",
-  description: "Nextfolio Projects",
+  description: "My Projects",
 };
 
-export default function Projects() {
+export default function ProjectsPosts() {
+  let allBlogs = getProjectsPosts();
+
   return (
     <section>
-      <h1 className="mb-8 text-2xl font-medium">Projects</h1>
-      <div>
-        {projects.map((project, index) => (
-          <Link
-            key={index}
-            href={project.url}
-            className="flex flex-col space-y-1 mb-5 transition-opacity duration-200 hover:opacity-80"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-              <h2 className="text-black dark:text-white">{project.title}</h2>
-              <p className="text-neutral-600 dark:text-neutral-400">
-                {project.description}
-              </p>
-            </div>
-          </Link>
-        ))}
+      <h2>Personal Projects</h2>
+      <p>This page lists some of my personal projects. Always working on something new, so this page will be updated regularly.</p>
+      <div className="mt-20">
+        {allBlogs
+          .sort((a, b) => {
+            if (
+              new Date(a.metadata.publishedAt) >
+              new Date(b.metadata.publishedAt)
+            ) {
+              return -1;
+            }
+            return 1;
+          })
+          .map((post) => (
+            <Link
+              key={post.slug}
+              className="flex flex-col space-y-1 mb-5 transition-opacity duration-200 hover:opacity-80"
+              href={`/projects/${post.slug}`}
+            >
+              <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                <h4 className="text-black dark:text-white">
+                  {post.metadata.title}
+                </h4>
+                {/* <p className="text-neutral-700 dark:text-neutral-300 text-base">
+                  {post.metadata.summary}
+                </p> */}
+                <p className="text-neutral-600 dark:text-neutral-400 tabular-nums text-sm">
+                  {formatDate(post.metadata.publishedAt, false)}
+                </p>
+              </div>
+            </Link>
+          ))}
       </div>
     </section>
   );

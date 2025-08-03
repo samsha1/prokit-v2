@@ -74,7 +74,7 @@ nav a { @apply px-2; }
 }
 
 .prose a {
-  @apply transition-all decoration-neutral-400 dark:decoration-neutral-600 underline-offset-2 decoration-[0.1em] font-normal text-[#000000] dark:text-[#FFFFFF];
+  @apply transition-all decoration-neutral-400 dark:decoration-neutral-600 underline-offset-2 decoration-[0.1em] font-normal text-[#ff3300] dark:text-[#FFFFFF];
 }
 
 .prose a:hover {
@@ -82,7 +82,7 @@ nav a { @apply px-2; }
 }
 
 .prose .anchor:after {
-  @apply text-neutral-300 dark:text-neutral-700;
+  @apply text-neutral-900 dark:text-neutral-700;
   content: "#";
 }
 
@@ -156,6 +156,10 @@ input[type="email"] {
 .prose .tweet a {
   text-decoration: inherit;
   font-weight: 500;
+}
+a{
+  color: #ff3300;
+  text-decoration: none;
 }
 
 table {

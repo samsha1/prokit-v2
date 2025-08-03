@@ -15,49 +15,35 @@ export default function Photos() {
         columns={3}
         images={[
           {
-            src: "/photos/photo1.jpg",
-            alt: "Roman columns",
-            href: "https://unsplash.com/photos/people-walking-near-building-during-daytime-dFLBDQQeffU?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash",
+            src: "/photos/streets-barcelona.jpg",
+            alt: "Streets In Barcelona",
+            href: "https://unsplash.com/photos/kezB4pSQegY",
           },
           {
-            src: "/photos/photo2.jpg",
-            alt: "Big Ben",
-            href: "https://unsplash.com/photos/big-ben-london-MdJq0zFUwrw?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash",
+            src: "/photos/helsinki-train.jpg",
+            alt: "Train During Evening in Helsinki",
+            href: "https://unsplash.com/photos/wy4pe4-vVmY",
           },
           {
-            src: "/photos/photo3.jpg",
-            alt: "Sacré-Cœur Basilica",
-            href: "https://unsplash.com/photos/a-view-of-the-inside-of-a-building-through-a-circular-window-Tp-3hrx88J4",
+            src: "/photos/sann-polo-bridge.jpg",
+            alt: "Sann Polo Bridge, Venice",
+            href: "https://unsplash.com/photos/72UxPU3FqR4",
           },
-          {
-            src: "/photos/photo4.jpg",
-            alt: "Eiffel Tower",
-            href: "https://unsplash.com/photos/the-eiffel-tower-towering-over-the-city-of-paris-OgPuPvPsHLM?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash",
-          },
-          {
-            src: "/photos/photo5.jpg",
-            alt: "Taj Mahal",
-            href: "https://unsplash.com/photos/taj-mahal-india-IPlPkWPJ2fo",
-          },
-          {
-            src: "/photos/photo6.jpg",
-            alt: "Colosseum",
-            href: "https://unsplash.com/photos/brown-concrete-building-under-blue-sky-during-daytime-3cyBR1rIJmA?utm_content=creditShareLink&utm_medium=referral&utm_source=unsplash",
-          },
+
         ]}
       />
 
       <ImageGrid
         columns={2}
         images={[
-          { src: "/photos/photo1.jpg", alt: "Roman columns" },
-          { src: "/photos/photo2.jpg", alt: "Big Ben" },
-          { src: "/photos/photo3.jpg", alt: "Sacré-Cœur Basilica" },
-          { src: "/photos/photo4.jpg", alt: "Eiffel Tower" },
+          { src: "/photos/rara-nepal.jpg", alt: "Small Village in Jumla", href: "https://unsplash.com/photos/ozHZ4ovxSNo" },
+          { src: "/photos/sagrada-familia.jpg", alt: "Sagrada Familia, Barcelona",href: "https://unsplash.com/photos/rUo4MDo-iE8" },
+          { src: "/photos/helsinki-neogothic-cathedral.jpg", alt: "Helsinki Neogothic Cathedral", href: "https://unsplash.com/photos/8vddJyX2xo8" },
+          { src: "/photos/ghandruk-nepal.jpg", alt: "Ghandruk, Nepal", href: "https://unsplash.com/photos/K6qnMGOUouw" },
         ]}
       />
 
-      <ImageGrid
+      {/* <ImageGrid
         columns={4}
         images={[
           { src: "/photos/photo1.jpg", alt: "Roman columns" },
@@ -67,7 +53,7 @@ export default function Photos() {
           { src: "/photos/photo5.jpg", alt: "Taj Mahal" },
           { src: "/photos/photo6.jpg", alt: "Colosseum" },
         ]}
-      />
+      /> */}
     </section>
   );
 }

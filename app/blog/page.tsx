@@ -3,7 +3,7 @@ import { formatDate, getBlogPosts } from "app/lib/posts";
 
 export const metadata = {
   title: "Blog",
-  description: "Nextfolio Blog",
+  description: "My Blog",
 };
 
 export default function BlogPosts() {
@@ -11,7 +11,7 @@ export default function BlogPosts() {
 
   return (
     <section>
-      <h1 className="mb-8 text-2xl font-medium">Our Blog</h1>
+      <h2 className="mb-10 text-2xl font-medium">Blog</h2>
       <div>
         {allBlogs
           .sort((a, b) => {
@@ -30,9 +30,12 @@ export default function BlogPosts() {
               href={`/blog/${post.slug}`}
             >
               <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-                <h2 className="text-black dark:text-white">
+                <h4 className="text-black dark:text-white">
                   {post.metadata.title}
-                </h2>
+                </h4>
+                {/* <p className="text-neutral-700 dark:text-neutral-300 text-base">
+                  {post.metadata.summary}
+                </p> */}
                 <p className="text-neutral-600 dark:text-neutral-400 tabular-nums text-sm">
                   {formatDate(post.metadata.publishedAt, false)}
                 </p>

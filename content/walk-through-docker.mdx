@@ -1,0 +1,98 @@
+---
+title: 'Walk Through Docker'
+publishedAt: '2024-04-05'
+summary: 'Discover Docker'
+---
+
+## What is Docker?
+Docker is the open platform for developers and system admins to build,ship and run distributed application on laptops,VM or cloud.Docker is widely used for operations to run multiple application in containerization form.For example: one container may have web server to run application and other container may handle mysql database that is used by web application. 
+
+Source [wiki](https://en.wikipedia.org/wiki/Docker_(software))
+
+## Where is docker used?
+
+Docker can be used in many cases, these days the software packages are run virually with more efficient,fast and secured way. So, Why not Docker?
+Let us move with simple example: Say, your friend want to share a project, which requires with latest golang version,mysql database and nginx web server....Now, to run this project manually what you need is to install same version of go system file,mysql and web server in your local machine. You also need to go through version configuration issue.
+To get rid of this headache, let's docker our project.
+First, write a simple docker file. create a filename Dockerfile in our root_project directory.
+
+```Dockerfile
+
+FROM amd64/golang:1.10.3
+WORKDIR /go/src/app
+COPY . .
+RUN go get -u github.com/gorilla/mux
+RUN go get github.com/pilu/fresh
+RUN go get github.com/sirupsen/logrus 
+CMD ["fresh"] 
+
+```
+
+Let's dig into script that we created
+
+
+**FROM amd64/golang:1.10.3** - pulls docker remote repo with go version go:1.10.3
+
+**WORKDIR /go/src/app** - defines working directory inside docker container.
+
+**COPY . .** - copies current working directory to /go/src/app inside docker container.
+
+
+```Dockerfile
+RUN go get -u github.com/gorilla/mux
+RUN go get github.com/pilu/fresh
+RUN go get github.com/sirupsen/logrus
+```
+installs different packages depends on your project. Here, I have installed **/gorilla/mux** that implements request router and dispatcher for matching incoming requests to their respective handler. **/pilu/fresh** is a command line tool that builds and (re)starts your web application everytime you save a code. Likewise, logrus is used to log the data of status.Remember, these packages are not mandatory and varies according to your requirement.
+
+```
+CMD ["fresh"]
+
+```
+
+CMD run once we successfully build and run our Dockerfile. If you want to run some command use CMD as simple as that. Here, I have use fresh command because when we docker run or project it automatically runs in command inside docker.
+
+Once, our docker file is ready build your docker application
+```sh
+docker build -t docker-golang .
+```
+
+builds docker application where -t flag is the name given to built repository or image as simple as that.
+
+once, you successfully built image. You are ready to run
+
+```sh
+docker run -d -p 8090:8090 -v $(pwd):/go/src/app  --env EXAMPLE_ENV_SETUP=test_value_env --name golang-env docker-golang
+```
+
+docker run command runs above image, where:
+
+```sh
+-d //runs docker image in backgroud (optional)
+-p is the port number to run the docker,left:right indicates the port to run outside and inside docker container.
+-v //volume created that represents the direcory of file outside and inside docker repository
+--env //enviroment value needed while running the project
+--name //name of the container which makes easy to remember rather using container id 
+--docker-golang //name of image or image id you created while building docker
+```
+
+After docker run in daemon mode, use
+
+```sh
+docker ps
+```
+Output:
+```
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
+ed07831e976a        docker-icinga-env   "fresh"             About an hour ago   Up About an hour    0.0.0.0:8090->8090/tcp   golang-env
+```
+There you go, You have a running instance inside docker which you can access through browser localhost:8090
+
+Now, Run the following command in the running container:
+```sh
+docker exec -it <runnning container name or id> /bin/bash
+```
+
+This will create a new Bash session in the container golang-env. This command will take you inside running container where you can check logs and do everything you like because You have a running instance. 
+
+Thank you. Your are awesone.

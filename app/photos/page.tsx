@@ -15,17 +15,17 @@ export default function Photos() {
         columns={3}
         images={[
           {
-            src: "/photos/streets-barcelona.jpg",
+            src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/streets-barcelona.jpg",
             alt: "Streets In Barcelona",
             href: "https://unsplash.com/photos/kezB4pSQegY",
           },
           {
-            src: "/photos/helsinki-train.jpg",
+            src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/helsinki-train.jpg",
             alt: "Train During Evening in Helsinki",
             href: "https://unsplash.com/photos/wy4pe4-vVmY",
           },
           {
-            src: "/photos/sann-polo-bridge.jpg",
+            src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/sann-polo-bridge.jpg",
             alt: "Sann Polo Bridge, Venice",
             href: "https://unsplash.com/photos/72UxPU3FqR4",
           },
@@ -36,10 +36,10 @@ export default function Photos() {
       <ImageGrid
         columns={2}
         images={[
-          { src: "/photos/rara-nepal.jpg", alt: "Small Village in Jumla", href: "https://unsplash.com/photos/ozHZ4ovxSNo" },
-          { src: "/photos/sagrada-familia.jpg", alt: "Sagrada Familia, Barcelona",href: "https://unsplash.com/photos/rUo4MDo-iE8" },
-          { src: "/photos/helsinki-neogothic-cathedral.jpg", alt: "Helsinki Neogothic Cathedral", href: "https://unsplash.com/photos/8vddJyX2xo8" },
-          { src: "/photos/ghandruk-nepal.jpg", alt: "Ghandruk, Nepal", href: "https://unsplash.com/photos/K6qnMGOUouw" },
+          { src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/rara-nepal.jpg", alt: "Small Village in Jumla", href: "https://unsplash.com/photos/ozHZ4ovxSNo" },
+          { src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/sagrada-familia.jpg", alt: "Sagrada Familia, Barcelona",href: "https://unsplash.com/photos/rUo4MDo-iE8" },
+          { src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/helsinki-neogothic-cathedral.jpg", alt: "Helsinki Neogothic Cathedral", href: "https://unsplash.com/photos/8vddJyX2xo8" },
+          { src: "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/ghandruk-nepal.jpg", alt: "Ghandruk, Nepal", href: "https://unsplash.com/photos/K6qnMGOUouw" },
         ]}
       />
 

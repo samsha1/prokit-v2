@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  images: {
+    domains: [
+      'fnz1dopstoar937o.public.blob.vercel-storage.com',
+      'www.linkedin.com'
+    ],
+  },
   async rewrites() {
     return [
       {
@@ -32,7 +38,7 @@ const nextConfig: NextConfig = {
       {
         source: "/json",
         destination: "/feed/feed.json",
-      },
+      }
     ];
   },
 };

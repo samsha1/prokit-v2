@@ -62,9 +62,15 @@ export default function Page() {
                 This complexity is what propels my sense of pride in deploying a system that works seamlessly by solving real-world problems of data accessibility. `}
         </p>
         <p>
-           {`I identify strongly as an explorer, a worldview that drives everything I do. Moving to new places, travelling, working, meeting to new people with different point of view, language & culture has always captivated me. Somewhere, I have also realised, we are all same - kind, social and hopeful. The cities, the mountains, the streets, and the silences are the mirrors and reflection of self, each revealing a little more of who I am and who I am aspire becoming. You travel not to escape, but to remember. `}
-
+           {`I identify strongly as an explorer, a worldview that drives everything I do. Moving to new places, travelling, working, meeting to new people with different point of view, language & culture has always captivated me. Somewhere, I have also realised, we are all same - kind, social and hopeful. The cities, the mountains, the streets, and the silences are the mirrors and reflection of self, each revealing a little more of who I am and who I am aspire becoming. You travel not to escape, but to remember. Something I try to live by, a line from a book`}{" "}  
+           <a href="https://www.amazon.com/Delivering-Happiness-Profits-Passion-Purpose/dp/160941280X">{`Delivering the happiness`}</a>
         </p>
+        <blockquote className="border-l-4 border-neutral-400 pl-6 italic text-neutral-700 my-6">
+          <p className="mb-2">
+            {`I'd committed to living by the philosophy that experiences were much more important to me than material things.`}
+          </p>
+          <footer className="text-sm text-neutral-500">— Tony Hsieh</footer>
+        </blockquote>
         <p className="mb-4">
           {`Last updated on ${buildInfo.lastUpdated}. I can be reached at: `}{" "}
           <a

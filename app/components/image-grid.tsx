@@ -15,6 +15,7 @@ export const ImageGrid: React.FC<ImageGridProps> = ({
   columns = 3,
 }) => {
   const gridClass = {
+    1: "grid-cols-1 sm:grid-cols-1",
     2: "grid-cols-2 sm:grid-cols-2",
     3: "grid-cols-2 sm:grid-cols-3",
     4: "grid-cols-2 sm:grid-cols-4",

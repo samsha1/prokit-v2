@@ -4,7 +4,7 @@ export const metaData = {
   name: "Samrat Shakya",
   ogImage: "/opengraph-image.png",
   description:
-    "'Builder / Tinkerer / Sports'",
+    "Builder / Tinkerer / Explorer",
 };
 
 export const socialLinks = {

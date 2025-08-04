@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { socialLinks } from "./lib/config";
 import buildInfo from "../build-info.json";
+import Slider from "./components/slider";
 
 
 export default function Page() {
@@ -67,10 +68,24 @@ export default function Page() {
         </p>
         <blockquote className="border-l-4 border-neutral-400 pl-6 italic text-neutral-700 my-6">
           <p className="mb-2">
-            {`I'd committed to living by the philosophy that experiences were much more important to me than material things.`}
+            {`I have committed to living by the philosophy that experiences were much more important to me than material things.`}
           </p>
           <footer className="text-sm text-neutral-500">— Tony Hsieh</footer>
         </blockquote>
+        <p>
+          {` Experience comes from work, love, family, travel, books and it leads to information, information sparks questions, and questions awaken curiosity. Curiosity seeks answers. I think all that we truly long for is freedom, freedom not from work, people, obligations but from our own mind — the kind that comes with the absence of wanting. I think that's how we learn to free ourselves. As`}{" "} <a href="https://en.wikipedia.org/wiki/Chris_McCandless">{`Chris McCandless`}</a> { `says` } <i>{`Absolute Freedoom`}</i>
+        </p>
+
+        <p>
+          {`I am fortunate and grateful for the work I do and the industry. I have unconditionally enjoyed what I do for more than 10 years now. Tech has opened me that freedom and I don’t take for granted. I’ve come to believe that with honesty & hardwork, almost anything is possible. The opportunity is ubiquitous - we need to stay true, keep learning, write often, be less control by distraction, meditate, and more importantly JUST DO. The possibility is endless and sky is the limit. Working remotely with people across the world has given me that sense, no matter where we are and come from we together can achieve our goal. With the right team, a healthy culture, and integrity in what we do, everything else tends to fall into place.`}
+        </p>
+          
+        {/* <Slider images={[
+          "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/monserat-full.jpg",
+          "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/orthodox-cathedral.jpg"
+        ]} /> */}
+
+        
         <p className="mb-4">
           {`Last updated on ${buildInfo.lastUpdated}. I can be reached at: `}{" "}
           <a
@@ -79,6 +94,7 @@ export default function Page() {
           >{`samratshakya5@gmail.com`}</a>
         </p>
       </div>
+      
     </section>
   );
 }

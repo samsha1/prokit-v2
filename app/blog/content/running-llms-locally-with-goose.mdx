@@ -1,7 +1,59 @@
 ---
-title: 'Let's run LLMs locally with Goose and Ollama'
-publishedAt: '2025-08-13'
+title: '3 Hours Offline: Goose + Ollama Became My Offline AI Co-Pilot'
+publishedAt: '2025-08-06'
 summary: 'Let's run LLMs locally with Goose and Ollama'
 ---
 
-Coming Soon...
+Last month, I was on a 3-hour flight to Thailand.
+
+No internet.
+No hotspot.
+And of course — a last-minute bug that needed fixing.
+
+Classic.
+
+I had some logs and notes locally, but I needed more than that — context, code suggestions, and some AI-like brainstorming. Normally, I’d pop open ChatGPT/Claude/Grok and move fast. But this time, I was stuck staring at my screen, trying to recall obscure error patterns from memory.
+
+<b>It killed me.</b>
+
+Then, After few minutes debugging and head-bashing I remembered, long-back I had [Ollama](https://ollama.com/) installed on my machine, even tried llama3 few times. And I had recently installed this thing called [Goose](https://block.github.io/goose/), a local AI agent framework. I had [setup](https://block.github.io/goose/docs/getting-started/providers#local-llms) recently along with a few local models like `gemma-1.1b`, `deepseek-r1:8b`, `qwen2.5-coder`, and `mistral`. I’d only played around with them briefly right after installing, never really diving deep.
+
+So I opened the terminal.
+Ran Goose.
+Pointed it to the local LLM from Ollama.
+
+```sh
+goose --model ollama://localhost:11434/qwen2.5-coder:7b
+```
+
+Within a few seconds, I was chatting — offline — with an agent that could understand my task, analyze my logs, and help brainstorm ideas.
+
+<b> It felt like ChatGPT — but fully offline. </b>
+
+That flight changed how I look at AI tools.
+
+I realized Ollama gives you a local model, but Goose gives it a brain — tools, memory, structured reasoning, and task management. It wasn’t just responding to prompts. It was helping me debug, summarize files, and even suggest shell commands based on my logs.
+
+What started as a travel headache became a real discovery.
+
+
+I didn’t need:
+
+- An API key
+- A browser
+- A network
+
+I just needed a working laptop. Goose gave me modular prompts, task agents, and the ability to extend it with custom logic. Suddenly, I could:
+
+- Load a local file and ask it questions
+- Create a custom agent just for log analysis
+- Add tools to fetch system info, run code snippets, and more
+
+And it all ran on top of Ollama — <i> fast, private, and offline. </i>
+
+
+That flight could’ve been wasted time. But greatful to Goose + Ollama, I got work done, stress-free, 30,000 feet in the air. If you’ve ever wished ChatGPT worked offline, or needed an AI assistant that runs with zero dependencies on the cloud, this is it.
+
+Goose + Ollama = Your offline AI co-pilot.
+
+

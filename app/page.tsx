@@ -76,6 +76,23 @@ export default function Page() {
           {` Experience comes from work, love, family, travel, books and it leads to information, information sparks questions, and questions awaken curiosity. Curiosity seeks answers. I think all that we truly long for is freedom, freedom not from work, people, obligations but from our own mind — the kind that comes with the absence of wanting. I think that's how we learn to free ourselves. As`}{" "} <a href="https://en.wikipedia.org/wiki/Chris_McCandless">{`Chris McCandless`}</a> { `says` } <i>{`Absolute Freedoom`}</i>
         </p>
 
+        <div style={{ width: '100vw', height: 'auto' }}>
+          <Image
+            src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/cloud-mardi.jpg"
+            alt="Beyond Cloud - Pokhara Nepal"
+            height={600}
+            width={700}
+            style={{
+              // maxWidth: '80%',           // Ensures the image doesn't exceed container width unless intended
+              width: '60vw',         // Stretches to full viewport width
+              height: '35vw',            // Maintains aspect ratio
+              // objectFit: 'cover',        // Ensures image covers the area without distortion
+              // marginLeft: '-5vw',        // Negative margin to stretch left
+              // marginRight: '-5vw',       // Negative margin to stretch right
+            }}
+          />
+        </div>
+
         <p>
           {`I am fortunate and grateful for the work I do and the industry. I have unconditionally enjoyed what I do for more than 10 years now. Tech has opened me that freedom and I don’t take for granted. I’ve come to believe that with honesty & hardwork, almost anything is possible. The opportunity is ubiquitous - we need to stay true, keep learning, write often, be less control by distraction, meditate, and more importantly JUST DO. The possibility is endless and sky is the limit. Working remotely with people across the world has given me that sense, no matter where we are and come from we together can achieve our goal. With the right team, a healthy culture, and integrity in what we do, everything else tends to fall into place.`}
         </p>
@@ -84,6 +101,8 @@ export default function Page() {
           "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/monserat-full.jpg",
           "https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/orthodox-cathedral.jpg"
         ]} /> */}
+
+        
 
         
         <p className="mb-4">

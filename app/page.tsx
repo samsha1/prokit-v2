@@ -78,18 +78,18 @@ export default function Page() {
 
         <div style={{ width: '100vw', height: 'auto' }}>
           <Image
-            src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/cloud-mardi.jpg"
+            src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/pokhara-nepal.jpg"
             alt="Beyond Cloud - Pokhara Nepal"
-            height={600}
-            width={700}
-            style={{
-              // maxWidth: '80%',           // Ensures the image doesn't exceed container width unless intended
-              width: '60vw',         // Stretches to full viewport width
-              height: '35vw',            // Maintains aspect ratio
-              // objectFit: 'cover',        // Ensures image covers the area without distortion
-              // marginLeft: '-5vw',        // Negative margin to stretch left
-              // marginRight: '-5vw',       // Negative margin to stretch right
-            }}
+            height={300}
+            width={800}
+            // style={{
+            //   // maxWidth: '80%',           // Ensures the image doesn't exceed container width unless intended
+            //   width: '6vw',         // Stretches to full viewport width
+            //   height: '35vw',            // Maintains aspect ratio
+            //   // objectFit: 'cover',        // Ensures image covers the area without distortion
+            //   // marginLeft: '-5vw',        // Negative margin to stretch left
+            //   // marginRight: '-5vw',       // Negative margin to stretch right
+            // }}
           />
         </div>
 

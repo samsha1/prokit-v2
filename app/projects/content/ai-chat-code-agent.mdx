@@ -113,17 +113,17 @@ Refactoring was intense, but the flow is now clean, secure, and scalable. Sample
 
 Next, I will be focusing:
 
-1. **Command-style** significant _slash triggers_ - Few commands that are crucial for the user:
-    - `/project`: Start a new project — clears previous memory/context, creates a new conversation/session. For example: /project Build a personal website for a chef
-    - `/fix`: Fix an issue — signals the model that the user is reporting a bug or undesired behavior.
-    - `/media`: Upload a file or image — the following message/media should be linked to the active project.
-    - `/status`: Check current project status — returns build status, deployed URL, and last update time.
-    - `/rollback`: Revert to previous version — useful if the new change breaks the site. `/rollback 2` _(go back 2 versions)_
-    - `/help`: Show available commands and usage examples.
+1. ** Command-style ** significant _slash triggers_ - Few commands that are crucial for the user:
+    - /project: Start a new project — clears previous memory/context, creates a new conversation/session. For example: /project Build a personal website for a chef
+    - /fix: Fix an issue — signals the model that the user is reporting a bug or undesired behavior.
+    - /media: Upload a file or image — the following message/media should be linked to the active project.
+    - /status: Check current project status — returns build status, deployed URL, and last update time.
+    - /rollback: Revert to previous version — useful if the new change breaks the site. /rollback 2 _(go back 2 versions)_
+    - /help: Show available commands and usage examples.
 
-2. **Make Followup better**: This has been one of the painful task, to make result better on each followup. I am trying to keep context length as minimal as possible and sending whole codebase is not optimal for AI to work along. Therefore, filtering this out with file URL and providing model full access to the file. Additionally, refactoring the prompt for this so that the model understands the context of followup. Ask model to provide only Diffs (?) and merge to previous version (?).
+2. ** Make followup better **: This has been one of the painful task, to make result better on each followup. I am trying to keep context length as minimal as possible and sending whole codebase is not optimal for AI to work along. Therefore, filtering this out with file URL and providing model full access to the file. Additionally, refactoring the prompt for this so that the model understands the context of followup. Ask model to provide only Diffs (?) and merge to previous version (?).
 
-3. **Handle Media**: Give user ownership to manage the media and adjust accordingly.
+3. ** Handle Media **: Give user ownership to manage the media and adjust accordingly.
 
 These are my next first three priorities. I will build and ship this by Sept 1 before my birthday.
 

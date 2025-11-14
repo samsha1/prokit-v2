@@ -1,16 +1,16 @@
 ---
-title: 'MCP and databases'
+title: 'MCP and databases, and it's virality'
 publishedAt: '2025-01-13'
 summary: 'MCP and databases, and it's virality'
 ---
 
 ## What is MCP and Why Everyone's Talking About It
 
-Model Context Protocol, or MCP, is Anthropic's open standard that launched in November 2024. Think of it as a universal connector that lets AI assistants like Claude, ChatGPT, Goose talk directly to your tools and data sources. Before MCP, every AI company was building their own custom integrations. Want to connect to Google Drive? Custom integration. Need database access? Another custom integration. It was messy and didn't scale. MCP changed the game by creating one standard protocol. Now, build one MCP server and any AI assistant that supports MCP can use it. It's like how USB standardized device connections - you don't need a different cable for every device anymore.
+Model Context Protocol, or [MCP](https://modelcontextprotocol.io/docs/getting-started/intro), is Anthropic's open standard that launched in November 2024 and flying high on rage. Technically, it's a simple API that enable RPC like communication between AI and external systems. Think of it as a universal connector that lets AI assistants like Claude, ChatGPT, Goose talk directly to your tools and external data sources. Before MCP, every AI company was building their own custom integrations. Want to connect to Google Drive? Custom integration. Need database access? Another custom integration. It was messy and didn't scale. MCP changed the game by creating one standard protocol. Now, build one MCP server and any AI assistant that supports MCP can use it. It's like how USB standardized device connections - you don't need a different cable for every device anymore.
 The developer community caught on fast. Within weeks of launch, hundreds of MCP servers appeared - for databases, file systems, APIs, even Git repositories. The protocol is open source, so anyone can build servers or integrate them into their applications.
-<i> Why did it go viral? </i> Because it solves a real pain point. Developers were tired of building the same integrations over and over. Companies wanted their AI assistants to access internal tools without custom development. MCP gave both groups what they needed.
+<i> Why did it go viral? </i> Because it solves a real pain point. Developers were tired of building the same integrations over and over. Companies wanted their AI assistants to access internal tools without custom development. MCP gave both groups what they needed. There is even [directory](https://mcp.so/) of 17000+ MCP servers implementations. Let's dive deep with practical exmple ahow how complex task turned into ease with MCP.
 
-### How MCP Made Complex Database Queries Simple
+### An Example
 
 Last week, our team needed to pull environmental data for a specific product from our database. Sounds simple? - Well, not quite.
 
@@ -20,13 +20,14 @@ We needed to find:
 - An item with EAN code 6411513699058
 - Only SERIES type items
 - Environmental profiles data with timescale 1 and unit in kg
-- Specific values: GWP total, circularity scores, and ecosystem impact
+- Specific values: GWP total, circularity scores, and Ecosystem impact
 
 For anyone who's worked with databases, you know this isn't a straightforward single query. Our database has multiple tables - items, env_profiles, env_data_calculations, and several connection tables. The relationships aren't always obvious, and some tables use UUIDs while others don't.
 
 ### The Old Way
 
 Traditionally, this would mean:
+
 1. Writing SQL queries to explore table structures
 2. Understanding the relationships between tables
 3. Dealing with data type mismatches
@@ -84,7 +85,7 @@ First, we gathered the necessary information from our Supabase project:
 - Access token (generated from your Supabase account settings)
 
 #### Step 2: Install the MCP Server
-Installed the ![Supabase MCP](https://supabase.com/docs/guides/getting-started/mcp "Supabase MCP") server package. You can do this through Claude Desktop's settings or configure it manually in your MCP configuration file.
+Installed the [Supabase MCP](https://supabase.com/docs/guides/getting-started/mcp) server package. You can do this through Claude Desktop's settings or configure it manually in your MCP configuration file.
 
 #### Step 3: Configure the Connection
 Added the Supabase MCP server configuration with our credentials. The setup looks something like this in your Claude Desktop config:
@@ -106,7 +107,10 @@ Added the Supabase MCP server configuration with our credentials. The setup look
 ```
 
 #### Step 4: Restart and Connect
-After saving the configuration, we restarted Claude Desktop. That's it. Claude could now directly interact with our Supabase database.
+After saving the configuration, we restarted Claude Desktop. That's it. Claude could now directly interact with our Supabase database. Here's simple video to explore and build picture:
+
+<iframe width="860" height="415" src="https://drive.google.com/file/d/118Zvy5_jdXBC_CtNylCiXJLGJ2K9hPn5/view?usp=sharing" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 ### Security Note
 Create a read-only access token specifically for this integration. This ensures Claude can query our data but can't modify anything in the database. Always follow the principle of least privilege when setting up these connections.
@@ -118,3 +122,4 @@ We're just scratching the surface. With MCP, our environmental data that was loc
 Just ask, and get answers.
 
 The setup took less than 10 minutes, but the value we're getting from it is immeasurable. That's the promise of MCP, and in our experience, it delivers.
+

@@ -37,7 +37,7 @@ export default function ProjectsPosts() {
                 {/* <p className="text-neutral-700 dark:text-neutral-300 text-base">
                   {post.metadata.summary}
                 </p> */}
-                <p className="text-neutral-600 dark:text-neutral-400 tabular-nums text-sm">
+                <p className="text-neutral-600 dark:text-neutral-400 tabular-nums text-base">
                   {formatDate(post.metadata.publishedAt, false)}
                 </p>
               </div>

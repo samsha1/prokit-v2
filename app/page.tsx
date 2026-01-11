@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { socialLinks } from "./lib/config";
-import buildInfo from "../build-info.json";
+
 import Slider from "./components/slider";
 
 
@@ -19,7 +19,7 @@ export default function Page() {
         />
       </a>
       <h2 className="slogan">Build / Tinker / Explore</h2>
-      <div className="prose prose-neutral dark:prose-invert">
+      <div className="prose prose-lg prose-neutral dark:prose-invert">
         <p className="mb-4">
           {`I am a hobbyist Software Engineer more inclined and fascinated towards Data.`}
         </p>
@@ -76,20 +76,13 @@ export default function Page() {
           {` Experience comes from work, love, family, travel, books and it leads to information, information sparks questions, and questions awaken curiosity. Curiosity seeks answers. I think all that we truly long for is freedom, freedom not from work, people, obligations but from our own mind — the kind that comes with the absence of wanting. I think that's how we learn to free ourselves. As`}{" "} <a href="https://en.wikipedia.org/wiki/Chris_McCandless">{`Chris McCandless`}</a> { `says` } <i>{`Absolute Freedoom`}</i>
         </p>
 
-        <div style={{ width: '100vw', height: 'auto' }}>
+        <div className="w-full h-auto">
           <Image
             src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/portfolio-kit-v2/pokhara-nepal.jpg"
             alt="Beyond Cloud - Pokhara Nepal"
+            className="w-full h-auto object-cover"
             height={300}
             width={800}
-            // style={{
-            //   // maxWidth: '80%',           // Ensures the image doesn't exceed container width unless intended
-            //   width: '6vw',         // Stretches to full viewport width
-            //   height: '35vw',            // Maintains aspect ratio
-            //   // objectFit: 'cover',        // Ensures image covers the area without distortion
-            //   // marginLeft: '-5vw',        // Negative margin to stretch left
-            //   // marginRight: '-5vw',       // Negative margin to stretch right
-            // }}
           />
         </div>
 
@@ -105,15 +98,7 @@ export default function Page() {
         
 
         
-        <p className="mb-4">
-          {`Last updated on ${buildInfo.lastUpdated}. I can be reached at: `}{" "}
-          <a
-            className="font-bold underline"
-            href="mailto:samratshakya5@gmail.com"
-          >{`samratshakya5@gmail.com`}</a>
-        </p>
       </div>
-      
     </section>
   );
 }

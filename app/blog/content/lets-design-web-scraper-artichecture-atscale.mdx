@@ -1,7 +1,71 @@
 ---
-title: 'Let's Design Web Scraping architecture at scale'
+title: 'Let''s Design Web Scraping Architecture at Scale'
 publishedAt: '2023-11-13'
-summary: 'Web Scraping architecture at scale'
+summary: 'Unlocking the power of massive data collection: A deep dive into an architecture capable of processing 500 million records daily.'
 ---
 
-Coming soon...
+<Image
+  alt="Web Scraping Architecture Diagram - Kubernetes, Fluentd, Kinesis, Flink"
+  src="https://fnz1dopstoar937o.public.blob.vercel-storage.com/scraping-arch.jpg"
+  width={800}
+  height={500}
+/>
+
+
+Imagine a global market research platform that needs to track price changes for 50 million products across Amazon, Walmart, and Target every single day. The data needs to be fresh, accurate, and ready for analysis by 8:00 AM. 
+
+Running a script on a laptop might work for 100 products. But for millions? That requires a completely different beast. This post explores a distributed architecture designed to handle over 500 million records per day, ensuring high availability and fault tolerance.
+
+## The Foundation: Kubernetes and Docker
+
+At the core of this system lies a massive fleet of crawlers running inside Docker containers, orchestrated by a Kubernetes cluster. This setup allows the system to scale up or down based on demand. If 5,000 crawlers are needed to finish a job by morning, Kubernetes spins them up. When the job is done, they spin down to save costs.
+
+These crawlers are not simple scripts. They are built using a specialized in-house SDK designed to handle the messy reality of the web. This SDK manages crucial tasks:
+- **Proxy Rotation**: Avoiding ID bans by switching IP addresses automatically. (Read more about the [proxy architecture logic here](https://www.samrat.fyi/projects/proxy-server)).
+- **Request Headers & User-Agents**: Mimicking legitimate browser traffic by intelligently rotating User-Agents and managing HTTP headers to avoid detection.
+- **Retries**: Automatically trying again if a page fails to load.
+- **Parsing**: converting raw HTML into structured JSON data.
+
+## The Data Pipeline: Moving Mountains of Data
+
+Once the data is scraped, it needs to go somewhere. This is where the architecture shines. A set of distributed tools is orchestrated to handle the lifecycle of each record.
+
+### 1. Fluentd: The Reliable Buffer
+In a massive distributed system, tight coupling is the enemy. Fluentd acts as a unified logging layer that decouples the crawlers from the downstream systems. It buffers the constant influx of records locally and guarantees they are shipped reliably. This buffering acts as a shock absorber during traffic spikes, ensuring data integrity from the moment of creation.
+
+### 2. AWS Kinesis: Durability and Retention
+While Fluentd collects the data, Kinesis allows for safe retention. As a managed streaming service, strictly ordered data durability is guaranteed. If the processing layer needs maintenance or encounters a bug, the data remains safe. It sits in Kinesis, ready to be replayed once the consumers are back online, preventing any data loss during downtime.
+
+### 3. Apache Flink: Stateful Processing
+This is the engine room of the pipeline. Flink handles stateful stream processing with precision:
+- **Filter and FlatMap**: A single scraped page might contain dozens of product listings. Flink "flatmaps" this single event into multiple distinct records and filters out malformed data.
+- **Checkpoints**: Flink periodically saves the state of the stream via checkpoints. If the pipeline halts, it does not need to restart from scratch. It simply rewinds to the last successful checkpoint and resumes. This mechanism ensures valid "exactly-once" processing, so data is neither lost nor duplicated.
+
+### 4. MongoDB: Flexible Storage
+With thousands of crawlers targeting different websites, the data structure varies wildly. A rigid database would fail to adapt. MongoDB’s NoSQL document model handles this variability effortlessly, storing the unique schema of each target site without requiring complex database migrations.
+
+### The Pipeline Explained (Like You're 5)
+
+Data engineering jargon like "stream processing" and "sharding" can be confusing. Let's think of this entire system as a massive **Airport Luggage System**.
+
+1.  **The Crawlers are the Passengers**: They arrive at the airport with luggage (the scraped data). They want to drop it off and leave immediately to catch their next flight (start the next scrape).
+2.  **Fluentd is the Check-in Counter**: The passengers don't care where the bag goes; they just hand it to the staff at the counter. Fluentd collects the data immediately so the crawler doesn't get stuck waiting.
+3.  **AWS Kinesis is the Conveyor Belt**: The check-in counter puts the bags on a giant, high-speed conveyor belt. This belt never stops and can hold millions of bags at once. Even if the sorting room is backed up, the belt keeps moving, ensuring no bags are dropped on the floor.
+4.  **Apache Flink is the Security & Sorting Team**: These are the workers standing by the belt. They open every bag, check if the contents are safe (valid data), fix any issues (cleaning/transformation), and organize them by destination.
+5.  **MongoDB is the Airplane**: Finally, the sorted and safety-checked bags are loaded into the plane (the database), ready for the users to access.
+
+## Handling Failure with Temporal
+
+In the world of web scraping, failure is guaranteed. Websites go down, layouts change, and networks timeout. 
+
+Sometimes, a single crawler is responsible for scraping 1 million records over several hours. If it crashes at 99%, restarting from zero is a waste of time and money.
+
+To solve this, **Temporal** is used to orchestrate long-running workflows. Temporal acts like a "save game" system. It tracks the state of every job. If a crawler crashes, Temporal knows exactly where it stopped and can restart the specific task on a new healthy container without losing progress. It ensures applications never lose state, making failures irrelevant.
+
+## The Log Management Challenge
+
+Since failure is inevitable, debugging becomes a daily routine. But here is the catch: logs are heavy. A single crawler can generate gigabytes of log data in a single run. Processing these logs from 1,000s of containers is typically as challenging as the scraping itself. I have written a dedicated deep dive on how to handle [scraped logs at scale here](https://www.samrat.fyi/projects/containers-logs), detailing how to leverage **ElasticSearch** to instantly query billions of log lines to pinpoint errors in milliseconds.
+
+## Conclusion
+
+Scaling a web scraper isn't just about writing a loop that runs faster. It is about building a system that expects failure and handles it gracefully. By combining Kubernetes for compute power, Kinesis and Flink for data streaming, and Temporal for workflow resilience, it is possible to process half a billion records a day without breaking a sweat.

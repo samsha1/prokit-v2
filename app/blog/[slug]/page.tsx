@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CustomMDX } from "app/components/mdx";
 import { formatDate, getBlogPosts, calculateReadingTime } from "app/lib/posts";
 import FollowButton from "app/components/follow-button";
+import SubscribeForm from "app/components/subscribe-form";
 import { metaData } from "app/lib/config";
 
 export async function generateStaticParams() {
@@ -100,6 +101,7 @@ export default async function Blog({ params }) {
       <article className="prose prose-lg prose-quoteless prose-neutral dark:prose-invert">
         <CustomMDX source={post.content} />
       </article>
+      <SubscribeForm />
     </section>
   );
 }

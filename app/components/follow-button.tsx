@@ -6,7 +6,7 @@ export default function FollowButton() {
       href="https://x.com/intent/follow?original_referer=https%3A%2F%2Fsamrat.fyi%2F&screen_name=samratshakya5"
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors"
+      className="inline-flex items-center gap-2 bg-black !text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors"
     >
       <svg
         viewBox="0 0 24 24"

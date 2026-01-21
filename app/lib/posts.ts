@@ -20,7 +20,7 @@ function parseFrontmatter(fileContent: string) {
   frontMatterLines.forEach((line) => {
     let [key, ...valueArr] = line.split(": ");
     let value = valueArr.join(": ").trim();
-    value = value.replace(/^['"](.*)['"]$/, "$1"); 
+    value = value.replace(/^['"](.*)['"]$/, "$1");
     metadata[key.trim() as keyof Metadata] = value;
   });
 
@@ -51,11 +51,11 @@ function getMDXData(dir: string) {
 }
 
 export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), "app","blog","content"));
+  return getMDXData(path.join(process.cwd(), "app", "blog", "content"));
 }
 
 export function getProjectsPosts() {
-  return getMDXData(path.join(process.cwd(), "app","projects","content"));
+  return getMDXData(path.join(process.cwd(), "app", "projects", "content"));
 }
 
 export function formatDate(date: string, includeRelative = false) {
@@ -92,4 +92,11 @@ export function formatDate(date: string, includeRelative = false) {
   }
 
   return `${fullDate} (${formattedDate})`;
+}
+
+export function calculateReadingTime(content: string) {
+  const wordsPerMinute = 200;
+  const words = content.trim().split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
 }

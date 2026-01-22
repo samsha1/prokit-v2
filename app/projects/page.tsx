@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { formatDate, getProjectsPosts } from "app/lib/posts";
+import { getProjectsPosts } from "app/lib/posts";
+import { formatDate } from "app/lib/utils";
 
 export const metadata = {
   title: "Projects",

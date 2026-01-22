@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CustomMDX } from "app/components/mdx";
-import { formatDate, getProjectsPosts, calculateReadingTime } from "app/lib/posts";
+import { getProjectsPosts } from "app/lib/posts";
+import { formatDate, calculateReadingTime } from "app/lib/utils";
 import FollowButton from "app/components/follow-button";
 import SubscribeForm from "app/components/subscribe-form";
+import CommentSection from "app/components/comment-section";
 import { metaData } from "app/lib/config";
 
 export async function generateStaticParams() {
@@ -102,6 +104,7 @@ export default async function Blog({ params }) {
         <CustomMDX source={post.content} />
       </article>
       <SubscribeForm />
+      <CommentSection slug={post.slug} />
     </section>
   );
 }

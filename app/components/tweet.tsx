@@ -9,18 +9,24 @@ const TweetContent = async ({ id, components, onError }: TweetProps) => {
         if (onError) {
           error = onError(err);
         } else {
-          console.error(err);
+          console.error("Tweet fetch failed:", err);
           error = err;
         }
       })
     : undefined;
 
-  if (!tweet) {
+  if (!tweet || (tweet as any).error || !(tweet as any).user) {
     const NotFound = components?.TweetNotFound || TweetNotFound;
-    return <NotFound error={error} />;
+    return <NotFound error={error || (tweet as any)?.error} />;
   }
 
-  return <EmbeddedTweet tweet={tweet} components={components} />;
+  try {
+    return <EmbeddedTweet tweet={tweet} components={components} />;
+  } catch (err) {
+    console.error("Failed to render tweet component:", err);
+    const NotFound = components?.TweetNotFound || TweetNotFound;
+    return <NotFound error={err} />;
+  }
 };
 
 export const ReactTweet = (props: TweetProps) => <TweetContent {...props} />;

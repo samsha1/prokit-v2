@@ -25,7 +25,7 @@ export default function Page() {
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff3300]"></span>
         </span>
         <span>
-          {`Starting and building `}
+          {`Started and building `}
           <a
             href="https://www.agenco.io"
             target="_blank"

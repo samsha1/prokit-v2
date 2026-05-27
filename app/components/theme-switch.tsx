@@ -28,21 +28,21 @@ export const ThemeSwitch: React.FC = () => {
   );
 
   const getColorPreference = (): "light" | "dark" => {
-    // if (
-    //   typeof window !== "undefined" &&
-    //   window.localStorage &&
-    //   typeof window.localStorage.getItem === "function"
-    // ) {
-    //   const storedPreference = window.localStorage.getItem(storageKey);
-    //   if (storedPreference) {
-    //     return storedPreference as "light" | "dark";
-    //   }
-    //   if (typeof window.matchMedia === "function") {
-    //     return window.matchMedia("(prefers-color-scheme: dark)").matches
-    //       ? "dark"
-    //       : "light";
-    //   }
-    // }
+    if (
+      typeof window !== "undefined" &&
+      window.localStorage &&
+      typeof window.localStorage.getItem === "function"
+    ) {
+      const storedPreference = window.localStorage.getItem(storageKey);
+      if (storedPreference) {
+        return storedPreference as "light" | "dark";
+      }
+      if (typeof window.matchMedia === "function") {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+    }
     return "light";
   };
 

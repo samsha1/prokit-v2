@@ -42,11 +42,6 @@ export async function TweetComponent({ id }: { id: string }) {
               src={tweet.profile_image}
               alt={tweet.name}
               className="w-10 h-10 rounded-full object-cover bg-neutral-100"
-              onError={(e) => {
-                // Fallback avatar if X avatar URL expires
-                (e.target as HTMLImageElement).src =
-                  "https://fnz1dopstoar937o.public.blob.vercel-storage.com/samsha-P6QWV1ArF5qqR8HPrfyIGISoYsbwWh.jpg";
-              }}
             />
             <div className="flex flex-col text-sm leading-tight font-sans">
               <span className="font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-1">

@@ -69,6 +69,14 @@ function Callout(props) {
   );
 }
 
+function getTextContent(node: any): string {
+  if (!node) return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(getTextContent).join("");
+  if (node.props && node.props.children) return getTextContent(node.props.children);
+  return "";
+}
+
 function slugify(str) {
   return str
     .toString()
@@ -82,7 +90,7 @@ function slugify(str) {
 
 function createHeading(level) {
   const Heading = ({ children }) => {
-    let slug = slugify(children);
+    let slug = slugify(getTextContent(children));
     return React.createElement(
       `h${level}`,
       { id: slug },

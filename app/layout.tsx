@@ -1,3 +1,22 @@
+// Defensive patch for environmental Node.js localStorage injection bugs
+if (typeof globalThis !== "undefined" && "localStorage" in globalThis) {
+  const mockStorage: any = (globalThis as any).localStorage;
+  if (!mockStorage || typeof mockStorage.getItem !== "function") {
+    try {
+      delete (globalThis as any).localStorage;
+    } catch (e) {
+      (globalThis as any).localStorage = {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+        clear: () => {},
+        key: () => null,
+        length: 0,
+      };
+    }
+  }
+}
+
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -5,7 +24,6 @@ import { Navbar } from "./components/nav";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Footer from "./components/footer";
-import { ThemeProvider } from "./components/theme-switch";
 import { metaData } from "./lib/config";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -74,26 +92,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased flex flex-col items-center justify-center mx-auto mt-2 lg:mt-8 mb-12">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          value={{ light: "light" }}
-          enableSystem={false}
-          // attribute="class"
-          // defaultTheme="system"
-          // enableSystem
-          // disableTransitionOnChange
-        >
-          
-          <main className="flex-auto min-w-0 mt-2 md:mt-6 flex flex-col px-6 sm:px-4 md:px-0 max-w-[900px] w-full">
-            
-            <Navbar />
-            {children}
-            <Footer />
-            <Analytics />
-            <SpeedInsights />
-          </main>
-        </ThemeProvider>
+        <main className="flex-auto min-w-0 mt-2 md:mt-6 flex flex-col px-6 sm:px-4 md:px-0 max-w-[900px] w-full">
+          <Navbar />
+          {children}
+          <Footer />
+          <Analytics />
+          <SpeedInsights />
+        </main>
       </body>
     </html>
   );

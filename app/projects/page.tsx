@@ -13,7 +13,31 @@ export default function ProjectsPosts() {
     <section>
       <h2>Personal Projects</h2>
       <p>This page lists some of my personal projects. Always working on something new, so this page will be updated regularly.</p>
-      <div className="mt-20">
+      
+      <div className="flex items-center gap-3 text-md sm:text-xl font-medium text-neutral-800 dark:text-neutral-200 mt-6 mb-10 font-sans">
+        <span>
+          {`Starting and building `}
+          <a
+            href="https://www.agenco.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#ff3300] font-semibold hover:underline"
+          >
+            {`Agenco`} 
+          </a>.
+          {` - Recent Projects available `} 
+          <a
+            href="https://www.agenco.io/blog"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#ff3300] font-semibold hover:underline"
+          >
+            {`here`} 
+          </a>.
+        </span>
+      </div>
+
+      <div className="mt-12">
         {allBlogs
           .sort((a, b) => {
             if (
